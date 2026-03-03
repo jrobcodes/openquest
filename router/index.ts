@@ -6,7 +6,7 @@
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Quest, Extra, GuideStep } from '../shared/types.js';
+import type { Quest, Extra, GuideStep, Coord } from '../shared/types.js';
 import { buildDAG, validateDAG } from './dag.js';
 import { groupByZone, buildZoneConstraints, solveZoneOrder, euclidean } from './zones.js';
 import { solveZoneRoute, routeToSteps } from './solver.js';
@@ -100,12 +100,18 @@ async function main() {
     // Improve
     const improvedSteps = improve(steps, zone.quests);
 
-    // Validate
+    // Validate (only intra-zone — cross-zone deps are handled by zone ordering)
     const routeValidation = validateRoute(improvedSteps, zone.quests);
     if (!routeValidation.valid) {
-      console.warn(`  WARNING: Route validation found ${routeValidation.violations.length} violations:`);
-      for (const v of routeValidation.violations.slice(0, 5)) {
-        console.warn(`    ${v}`);
+      // Filter out cross-zone violations
+      const intraZoneViolations = routeValidation.violations.filter(v => !v.includes('(cross-zone)'));
+      if (intraZoneViolations.length > 0) {
+        console.warn(`  WARNING: ${intraZoneViolations.length} intra-zone violations:`);
+        for (const v of intraZoneViolations.slice(0, 5)) {
+          console.warn(`    ${v}`);
+        }
+      } else {
+        console.log(`  Route validation passed (${routeValidation.violations.length} cross-zone deps OK).`);
       }
     } else {
       console.log('  Route validation passed.');
@@ -172,13 +178,34 @@ async function main() {
 }
 
 function calculateNaiveDistance(quests: Quest[]): number {
+  // Calculate distance of doing quests in quest ID order within each zone
+  // Route: for each quest, accept → objectives → turnin, measuring all travel
+  const byZone = new Map<number, Quest[]>();
+  for (const q of quests) {
+    if (!byZone.has(q.mapId)) byZone.set(q.mapId, []);
+    byZone.get(q.mapId)!.push(q);
+  }
+
   let dist = 0;
-  const sorted = [...quests].sort((a, b) => a.id - b.id);
-  for (let i = 1; i < sorted.length; i++) {
-    const prev = sorted[i - 1].acceptLocation || sorted[i - 1].objectiveLocations[0];
-    const curr = sorted[i].acceptLocation || sorted[i].objectiveLocations[0];
-    if (prev && curr) {
-      dist += euclidean(prev, curr);
+  for (const zoneQuests of byZone.values()) {
+    const sorted = [...zoneQuests].sort((a, b) => a.id - b.id);
+    let pos: Coord | null = null;
+
+    for (const q of sorted) {
+      const accept = q.acceptLocation || q.objectiveLocations[0] || q.turnInLocation;
+      if (!accept) continue;
+
+      if (pos) dist += euclidean(pos, accept);
+      pos = accept;
+
+      for (const obj of q.objectiveLocations) {
+        dist += euclidean(pos!, obj);
+        pos = obj;
+      }
+
+      const turnin = q.turnInLocation || accept;
+      dist += euclidean(pos!, turnin);
+      pos = turnin;
     }
   }
   return dist;

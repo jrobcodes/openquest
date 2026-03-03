@@ -16,10 +16,15 @@ interface RouteNode {
   extraType?: 'glyph' | 'treasure' | 'rare';
 }
 
+/** Get the best known location for a quest (accept > first objective > null). */
+function questLocation(q: Quest): Coord | null {
+  return q.acceptLocation || q.objectiveLocations[0] || q.turnInLocation || null;
+}
+
 /**
  * Modified Kahn's algorithm with nearest-neighbor priority.
- * Maintains a set of "available" quests (all prereqs done) and always
- * picks the one closest to the current position.
+ * Processes one quest at a time, emitting accept → objectives → turnin nodes.
+ * After each turn-in, checks for nearby quests that can be batch-accepted.
  */
 export function solveZoneRoute(
   quests: Quest[],
@@ -31,7 +36,6 @@ export function solveZoneRoute(
   const questMap = new Map<number, Quest>();
   for (const q of quests) questMap.set(q.id, q);
 
-  // Only consider prerequisites that are within this zone's quest set
   const localQuestIds = new Set(quests.map(q => q.id));
   const inDegree = new Map<number, number>();
   const dependents = new Map<number, number[]>();
@@ -46,7 +50,7 @@ export function solveZoneRoute(
     }
   }
 
-  // Step 1: Build backbone route using topo-sort + nearest-neighbor
+  // Initialize available set (zero in-degree)
   const available = new Set<number>();
   for (const q of quests) {
     if ((inDegree.get(q.id) || 0) === 0) {
@@ -56,129 +60,215 @@ export function solveZoneRoute(
 
   const route: RouteNode[] = [];
   const completed = new Set<number>();
-  let currentPos: Coord = startPosition || quests[0].acceptLocation || { x: 0, y: 0, mapId: 0 };
+  let currentPos: Coord = startPosition ||
+    questLocation(quests[0]) ||
+    { x: 0, y: 0, mapId: quests[0].mapId };
 
-  while (available.size > 0) {
-    // Pick nearest available quest (by accept location)
+  // Helper: pick nearest available quest
+  function pickNearest(): number {
     let bestId = -1;
     let bestDist = Infinity;
-
     for (const qid of available) {
       const q = questMap.get(qid)!;
-      const loc = q.acceptLocation || q.objectiveLocations[0] || currentPos;
+      const loc = questLocation(q) || currentPos;
       const dist = euclidean(currentPos, loc);
       if (dist < bestDist) {
         bestDist = dist;
         bestId = qid;
       }
     }
+    return bestId;
+  }
 
-    if (bestId === -1) break;
-
-    const quest = questMap.get(bestId)!;
-    available.delete(bestId);
-
-    // Step 1a: Check for nearby quests we can batch-accept
-    const batchAccept = [quest];
-    const BATCH_RADIUS = 50; // cluster radius for batching
-
-    if (quest.acceptLocation) {
-      for (const qid of available) {
-        const q = questMap.get(qid)!;
-        if (q.acceptLocation && euclidean(quest.acceptLocation, q.acceptLocation) < BATCH_RADIUS) {
-          batchAccept.push(q);
-        }
+  // Helper: mark quest completed and unlock dependents
+  function completeQuest(questId: number): void {
+    completed.add(questId);
+    for (const depId of (dependents.get(questId) || [])) {
+      const newDeg = (inDegree.get(depId) || 1) - 1;
+      inDegree.set(depId, newDeg);
+      if (newDeg === 0 && !completed.has(depId)) {
+        available.add(depId);
       }
     }
+  }
 
-    // Accept all batched quests
-    for (const bq of batchAccept) {
-      if (bq.id !== bestId) available.delete(bq.id);
+  // Helper: process a single quest (accept → objectives → turnin)
+  function processQuest(quest: Quest): void {
+    const loc = questLocation(quest);
 
-      if (bq.acceptLocation) {
-        route.push({
-          type: 'accept',
-          questId: bq.id,
-          questTitle: bq.title,
-          location: bq.acceptLocation,
-          description: `Accept: ${bq.title}`,
-        });
-        currentPos = bq.acceptLocation;
-      }
+    // Accept
+    if (loc) {
+      route.push({
+        type: 'accept',
+        questId: quest.id,
+        questTitle: quest.title,
+        location: quest.acceptLocation || loc,
+        description: `Accept: ${quest.title}`,
+      });
+      currentPos = quest.acceptLocation || loc;
     }
 
-    // Do objectives for all batched quests (ordered by proximity)
-    const allObjectiveNodes: RouteNode[] = [];
-    for (const bq of batchAccept) {
-      for (const loc of bq.objectiveLocations) {
-        allObjectiveNodes.push({
-          type: 'objective',
-          questId: bq.id,
-          questTitle: bq.title,
-          location: loc,
-          description: `Complete objective: ${bq.title}`,
-        });
-      }
-    }
-
-    // Sort objective nodes by nearest-neighbor from current position
-    const remaining = [...allObjectiveNodes];
-    while (remaining.length > 0) {
+    // Objectives (nearest-neighbor order)
+    const objLocs = [...quest.objectiveLocations];
+    while (objLocs.length > 0) {
       let nearestIdx = 0;
       let nearestDist = Infinity;
-      for (let i = 0; i < remaining.length; i++) {
-        const d = euclidean(currentPos, remaining[i].location);
+      for (let i = 0; i < objLocs.length; i++) {
+        const d = euclidean(currentPos, objLocs[i]);
         if (d < nearestDist) {
           nearestDist = d;
           nearestIdx = i;
         }
       }
-      const node = remaining.splice(nearestIdx, 1)[0];
-      route.push(node);
-      currentPos = node.location;
+      const objLoc = objLocs.splice(nearestIdx, 1)[0];
+      route.push({
+        type: 'objective',
+        questId: quest.id,
+        questTitle: quest.title,
+        location: objLoc,
+        description: `Complete objective: ${quest.title}`,
+      });
+      currentPos = objLoc;
     }
 
-    // Step 1b: Check for turn-in batching
-    const batchTurnin: Quest[] = [];
-    for (const bq of batchAccept) {
-      if (bq.turnInLocation) {
-        batchTurnin.push(bq);
+    // Turn-in
+    if (quest.turnInLocation) {
+      route.push({
+        type: 'turnin',
+        questId: quest.id,
+        questTitle: quest.title,
+        location: quest.turnInLocation,
+        description: `Turn in: ${quest.title}`,
+      });
+      currentPos = quest.turnInLocation;
+    } else if (loc) {
+      // No separate turn-in — auto-completes or turn in at accept NPC
+      route.push({
+        type: 'turnin',
+        questId: quest.id,
+        questTitle: quest.title,
+        location: loc,
+        description: `Turn in: ${quest.title}`,
+      });
+      currentPos = loc;
+    }
+
+    completeQuest(quest.id);
+  }
+
+  // Main loop
+  while (available.size > 0) {
+    const bestId = pickNearest();
+    if (bestId === -1) break;
+
+    const quest = questMap.get(bestId)!;
+    available.delete(bestId);
+
+    // Check for nearby quests we can batch-accept (same NPC cluster)
+    const BATCH_RADIUS = 50;
+    const batchQuests = [quest];
+    const acceptLoc = quest.acceptLocation;
+
+    if (acceptLoc) {
+      // Only batch quests that are available AND nearby
+      const nearbyIds: number[] = [];
+      for (const qid of available) {
+        const q = questMap.get(qid)!;
+        if (q.acceptLocation && euclidean(acceptLoc, q.acceptLocation) < BATCH_RADIUS) {
+          nearbyIds.push(qid);
+        }
+      }
+      for (const qid of nearbyIds) {
+        batchQuests.push(questMap.get(qid)!);
+        available.delete(qid);
       }
     }
 
-    // Sort turn-ins by proximity and add them
-    batchTurnin.sort((a, b) => {
-      const da = euclidean(currentPos, a.turnInLocation!);
-      const db = euclidean(currentPos, b.turnInLocation!);
-      return da - db;
-    });
+    if (batchQuests.length === 1) {
+      // Simple case: process single quest
+      processQuest(quest);
+    } else {
+      // Batch: accept all → do all objectives → turn in all
 
-    for (const bq of batchTurnin) {
-      route.push({
-        type: 'turnin',
-        questId: bq.id,
-        questTitle: bq.title,
-        location: bq.turnInLocation!,
-        description: `Turn in: ${bq.title}`,
-      });
-      currentPos = bq.turnInLocation!;
-    }
-
-    // Mark all batched quests as completed and unlock dependents
-    for (const bq of batchAccept) {
-      completed.add(bq.id);
-      const deps = dependents.get(bq.id) || [];
-      for (const depId of deps) {
-        const newDeg = (inDegree.get(depId) || 1) - 1;
-        inDegree.set(depId, newDeg);
-        if (newDeg === 0 && !completed.has(depId)) {
-          available.add(depId);
+      // Accept all
+      for (const bq of batchQuests) {
+        const loc = bq.acceptLocation || questLocation(bq);
+        if (loc) {
+          route.push({
+            type: 'accept',
+            questId: bq.id,
+            questTitle: bq.title,
+            location: loc,
+            description: `Accept: ${bq.title}`,
+          });
+          currentPos = loc;
         }
+      }
+
+      // Collect all objective locations with quest context
+      const allObjs: { loc: Coord; quest: Quest }[] = [];
+      for (const bq of batchQuests) {
+        for (const loc of bq.objectiveLocations) {
+          allObjs.push({ loc, quest: bq });
+        }
+      }
+
+      // Nearest-neighbor through all objectives
+      while (allObjs.length > 0) {
+        let nearestIdx = 0;
+        let nearestDist = Infinity;
+        for (let i = 0; i < allObjs.length; i++) {
+          const d = euclidean(currentPos, allObjs[i].loc);
+          if (d < nearestDist) {
+            nearestDist = d;
+            nearestIdx = i;
+          }
+        }
+        const { loc, quest: objQuest } = allObjs.splice(nearestIdx, 1)[0];
+        route.push({
+          type: 'objective',
+          questId: objQuest.id,
+          questTitle: objQuest.title,
+          location: loc,
+          description: `Complete objective: ${objQuest.title}`,
+        });
+        currentPos = loc;
+      }
+
+      // Turn in all (nearest-neighbor order)
+      const turnins = batchQuests
+        .filter(bq => bq.turnInLocation || questLocation(bq))
+        .map(bq => ({ quest: bq, loc: (bq.turnInLocation || questLocation(bq))! }));
+
+      while (turnins.length > 0) {
+        let nearestIdx = 0;
+        let nearestDist = Infinity;
+        for (let i = 0; i < turnins.length; i++) {
+          const d = euclidean(currentPos, turnins[i].loc);
+          if (d < nearestDist) {
+            nearestDist = d;
+            nearestIdx = i;
+          }
+        }
+        const { quest: tiQuest, loc: tiLoc } = turnins.splice(nearestIdx, 1)[0];
+        route.push({
+          type: 'turnin',
+          questId: tiQuest.id,
+          questTitle: tiQuest.title,
+          location: tiLoc,
+          description: `Turn in: ${tiQuest.title}`,
+        });
+        currentPos = tiLoc;
+      }
+
+      // Mark all completed
+      for (const bq of batchQuests) {
+        completeQuest(bq.id);
       }
     }
   }
 
-  // Step 3: Insert extras using cheapest insertion
+  // Insert extras using cheapest insertion
   if (extras.length > 0) {
     insertExtras(route, extras);
   }
@@ -188,19 +278,17 @@ export function solveZoneRoute(
 
 /**
  * Cheapest insertion heuristic for extras (glyphs, treasures, rares).
- * For each extra, find the route leg where inserting it adds minimum distance.
  */
 function insertExtras(route: RouteNode[], extras: Extra[]): void {
   for (const extra of extras) {
     const extraLoc = extra.location;
-    let bestIdx = route.length; // default: append at end
+    let bestIdx = route.length;
     let bestCost = Infinity;
 
     for (let i = 0; i <= route.length; i++) {
       const prev = i > 0 ? route[i - 1].location : (route[0]?.location || extraLoc);
       const next = i < route.length ? route[i].location : (route[route.length - 1]?.location || extraLoc);
 
-      // Cost of inserting: dist(prev, extra) + dist(extra, next) - dist(prev, next)
       const originalDist = i > 0 && i < route.length ? euclidean(prev, next) : 0;
       const newDist = euclidean(prev, extraLoc) + euclidean(extraLoc, next);
       const insertionCost = newDist - originalDist;
@@ -211,14 +299,12 @@ function insertExtras(route: RouteNode[], extras: Extra[]): void {
       }
     }
 
-    const node: RouteNode = {
+    route.splice(bestIdx, 0, {
       type: 'collect',
       location: extraLoc,
       description: `Collect ${extra.type}: ${extra.name}`,
       extraType: extra.type,
-    };
-
-    route.splice(bestIdx, 0, node);
+    });
   }
 }
 

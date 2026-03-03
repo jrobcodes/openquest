@@ -7,36 +7,148 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import type {
   Quest, Extra, Coord, Objective, Rewards,
-  RawQuestLine, RawQuestLineXQuest, RawQuestObjective,
-  RawQuestPOIBlob, RawQuestPOIPoint, BlizzardQuestResponse,
+  BlizzardQuestResponse,
 } from '../shared/types.js';
 
 const RAW_DIR = join(import.meta.dirname, '..', 'data', 'raw');
 const ENRICHED_DIR = join(import.meta.dirname, '..', 'data', 'enriched');
 const OUTPUT_DIR = join(import.meta.dirname, '..', 'data', 'midnight');
 
-// Midnight zone UiMapIDs — these need to be verified from actual DB2 data
-// The addon uses placeholder IDs 2369-2372; we'll try to detect them from data
-// and fall back to including all quest line quests if zone filtering fails.
-const MIDNIGHT_ZONE_NAMES = new Set([
-  'eversong', "eversong woods",
-  "zul'aman", 'zulaman', "zul'aman",
-  'harandar',
-  'voidstorm',
-  // Sub-zones and alternates
-  'silvermoon', "quel'thalas", 'ghostlands', 'sunwell', 'tranquillien',
+// Midnight zone UiMapIDs (verified from DB2 cross-reference)
+const MIDNIGHT_ZONES: Record<number, string> = {
+  2395: 'Eversong Woods',
+  2437: "Zul'Aman",
+  2413: 'Harandar',
+  2405: 'Voidstorm',
+};
+const MIDNIGHT_MAP_IDS = new Set(Object.keys(MIDNIGHT_ZONES).map(Number));
+
+// Quest line IDs that belong to Midnight (identified from DB2 data)
+// Includes main story, side stories, and zone content — excludes WQ/repeatables
+const MIDNIGHT_STORY_LINE_IDS = new Set([
+  // Campaign / main story
+  5719, 5720, 5721, // Whispers/Shadowfall/Ripple Effects
+  5722, 5723, 5724, // Amani stories
+  5725, 5726, 5727, // Of Caves/Call of Goddess/Emergence
+  5728, 5729, 5730, // Into the Abyss/Night's Veil/Dawn of Reckoning
+  5750, 5751, // Path of Light / Regrets
+  5792, 5793, // Foothold / Voidspire
+  5797, 5798, // March on Quel'Danas / Dawn of New Well
+  5826, 5827, 5828, // Path of Light II/III/IV
+  5909, // Legend of Aln'sharan
+  5938, // Where War Slumbers
+  5940, // Return to Scouting Map
+  5945, 5947, 5948, // Prey / Rise of Red Dawn
+  5951, // What Remains of Broken Throne
+  5979, // The Darkening Sky
+  6041, 6043, // Astalor / Ren'dorei
+  6130, 6131, // Eversong Intro / Scouting Map
+  // Side stories
+  5778, 5781, // Healing Spirit / Aspiring Academic
+  5804, 5805, // Theft Tracking / Port Detective
+  5841, 5967, // Saltheril's Haven
+  5898, // One Adventurous Hatchling
+  5901, 5905, // Sorrowing Kin / Unlikely Friends
+  5907, // A Goblin in Harandar
+  5908, // Paladin Rescue
+  5910, // The Grudge Pit
+  5929, // The Empty Cradle
+  5930, // The Cult Within
+  5932, // Trials of Shul'ka
+  5933, // The Nethersent
+  5935, 5936, 5937, // Late Bloomers / Dance with Devil / Train Protegee
+  5939, // Vengeance for Tolbani
+  5943, 5944, // Shadow Puppets / Peril Among Petals
+  5949, 5950, // Sunbath / Venomous History
+  5952, // Greenspeaker's Vigil
+  5958, // Daggerspine Landing
+  5960, // Haranir Never Say Die
+  5961, 5962, // To Be Changed / Nightbreaker
+  5966, // Harandar's Kitchen
+  5969, // Far Striding
+  5971, // Voice of Nalorakk
+  5974, 5975, // Crimson Rogue / Something Vile
+  5977, // Cultivating Hope
+  5981, // Between Two Trolls
+  5982, // The Arcantina
+  5988, // Loa of Murlocs
+  5989, // Tailor Troubles
+  5993, // Runestone Rumbles
+  5999, // No Fear
+  6001, // A More Potent Foe
+  6010, // Void Peers Back
+  6011, // Reclaiming De Honor
+  6012, 6013, 6014, // Domanaar's Friend / Voice Inside / Oaths
+  6017, 6018, // Secrets in Dark / Blinding Sun
+  6020, // Flowers for Amalthea
+  6022, // Go Low Go Loud
+  6028, // Pathogenic Problem
+  6030, // Scootin Through Silvermoon
+  6032, // Spot Light
+  6036, // Silence at Fungara
+  6038, 6039, 6040, // Palette / Hunter's Rite / Predator
+  6042, // Bitter Honor
+  6044, 6045, // Beyond Walls / River-Walkers
+  6048, // Sawdust
+  6052, // Bloodstains
+  6055, // Sound of Her Voice
+  6209, // Legends of Haranir
+  6224, // Something Vile (alt)
 ]);
 
-// We'll build this map from AreaPOI data
-let midnightMapIds = new Set<number>();
+// Raw DB2 row types (actual column names from extraction)
+interface RawQuestLineRow {
+  _ID: number;
+  Name_lang: string;
+  Flags: number;
+}
+
+interface RawQLXQRow {
+  _ID: number;
+  QuestLineID: number;
+  QuestID: number;
+  OrderIndex: number;
+  Flags: number;
+}
+
+interface RawObjectiveRow {
+  _ID: number;
+  QuestID: number;
+  Type: number;
+  Amount: number;
+  ObjectID: number;
+  Description_lang: string;
+  OrderIndex: number;
+}
+
+interface RawPOIBlobRow {
+  _ID: number;
+  QuestID: number;
+  ObjectiveIndex: number;
+  MapID: number;
+  UiMapID: number;
+  NumPoints: number;
+}
+
+interface RawPOIPointRow {
+  _ID: number;
+  QuestPOIBlobID: number;
+  X: number;
+  Y: number;
+  Z: number;
+}
+
+interface RawVignetteRow {
+  _ID: number;
+  Name_lang: string;
+  VisibleTrackingQuestID: number;
+  RewardQuestID: number;
+  Flags: number;
+  VignetteType: number;
+}
 
 async function loadJSON<T>(path: string): Promise<T> {
   return JSON.parse(await readFile(path, 'utf-8')) as T;
-}
-
-function isMidnightZone(name: string): boolean {
-  const lower = name.toLowerCase();
-  return [...MIDNIGHT_ZONE_NAMES].some(z => lower.includes(z));
 }
 
 async function main() {
@@ -47,12 +159,12 @@ async function main() {
 
   // Load all raw data
   console.log('Loading raw DB2 data...');
-  const questLines = await loadJSON<(RawQuestLine & { _ID: number })[]>(join(RAW_DIR, 'questline.json'));
-  const qlxq = await loadJSON<(RawQuestLineXQuest & { _ID: number })[]>(join(RAW_DIR, 'questlinexquest.json'));
-  const objectives = await loadJSON<(RawQuestObjective & { _ID: number })[]>(join(RAW_DIR, 'questobjective.json'));
-  const poiBlobs = await loadJSON<(RawQuestPOIBlob & { _ID: number })[]>(join(RAW_DIR, 'questpoiblob.json'));
-  const poiPoints = await loadJSON<(RawQuestPOIPoint & { _ID: number })[]>(join(RAW_DIR, 'questpoipoint.json'));
-  const areaPOIs = await loadJSON<{ _ID: number; Name?: string; Name_lang?: string; Pos?: [number, number]; UiMapID?: number; ContinentID?: number }[]>(join(RAW_DIR, 'areapoi.json'));
+  const questLines = await loadJSON<RawQuestLineRow[]>(join(RAW_DIR, 'questline.json'));
+  const qlxq = await loadJSON<RawQLXQRow[]>(join(RAW_DIR, 'questlinexquest.json'));
+  const objectives = await loadJSON<RawObjectiveRow[]>(join(RAW_DIR, 'questobjective.json'));
+  const poiBlobs = await loadJSON<RawPOIBlobRow[]>(join(RAW_DIR, 'questpoiblob.json'));
+  const poiPoints = await loadJSON<RawPOIPointRow[]>(join(RAW_DIR, 'questpoipoint.json'));
+  const vignettes = await loadJSON<RawVignetteRow[]>(join(RAW_DIR, 'vignette.json'));
 
   // Load enriched API data
   console.log('Loading API enrichment data...');
@@ -66,23 +178,14 @@ async function main() {
   // Build lookup maps
   console.log('Building indexes...\n');
 
-  // QuestLine ID → name
-  const questLineNames = new Map<number, string>();
+  // QuestLine ID → name + flags
+  const questLineInfo = new Map<number, { name: string; flags: number }>();
   for (const ql of questLines) {
-    questLineNames.set(ql._ID, ql.Name || `QuestLine_${ql._ID}`);
-  }
-
-  // QuestID → quest line entries (a quest can appear in multiple lines)
-  const questToLines = new Map<number, RawQuestLineXQuest[]>();
-  for (const entry of qlxq) {
-    if (!questToLines.has(entry.QuestID)) {
-      questToLines.set(entry.QuestID, []);
-    }
-    questToLines.get(entry.QuestID)!.push(entry);
+    questLineInfo.set(ql._ID, { name: ql.Name_lang, flags: ql.Flags });
   }
 
   // QuestLineID → sorted entries
-  const lineEntries = new Map<number, RawQuestLineXQuest[]>();
+  const lineEntries = new Map<number, RawQLXQRow[]>();
   for (const entry of qlxq) {
     if (!lineEntries.has(entry.QuestLineID)) {
       lineEntries.set(entry.QuestLineID, []);
@@ -94,7 +197,7 @@ async function main() {
   }
 
   // QuestID → objectives
-  const questObjectives = new Map<number, RawQuestObjective[]>();
+  const questObjectives = new Map<number, RawObjectiveRow[]>();
   for (const obj of objectives) {
     if (!questObjectives.has(obj.QuestID)) {
       questObjectives.set(obj.QuestID, []);
@@ -102,9 +205,10 @@ async function main() {
     questObjectives.get(obj.QuestID)!.push(obj);
   }
 
-  // QuestID → POI blobs
-  const questPOIBlobMap = new Map<number, RawQuestPOIBlob[]>();
+  // QuestID → POI blobs (only Midnight zones)
+  const questPOIBlobMap = new Map<number, RawPOIBlobRow[]>();
   for (const blob of poiBlobs) {
+    if (!MIDNIGHT_MAP_IDS.has(blob.UiMapID) && blob.UiMapID !== 0) continue;
     if (!questPOIBlobMap.has(blob.QuestID)) {
       questPOIBlobMap.set(blob.QuestID, []);
     }
@@ -112,7 +216,7 @@ async function main() {
   }
 
   // POIBlob ID → points
-  const blobPoints = new Map<number, RawQuestPOIPoint[]>();
+  const blobPoints = new Map<number, RawPOIPointRow[]>();
   for (const pt of poiPoints) {
     if (!blobPoints.has(pt.QuestPOIBlobID)) {
       blobPoints.set(pt.QuestPOIBlobID, []);
@@ -120,25 +224,17 @@ async function main() {
     blobPoints.get(pt.QuestPOIBlobID)!.push(pt);
   }
 
-  // Detect Midnight UiMapIDs from AreaPOI names
-  for (const poi of areaPOIs) {
-    const name = poi.Name || poi.Name_lang || '';
-    if (isMidnightZone(name) && poi.UiMapID) {
-      midnightMapIds.add(poi.UiMapID);
+  // Find which quest IDs belong to Midnight (in a Midnight quest line AND have POI in Midnight zones)
+  const midnightQuestIds = new Set<number>();
+  for (const entry of qlxq) {
+    if (!MIDNIGHT_STORY_LINE_IDS.has(entry.QuestLineID)) continue;
+    // Check if this quest has POI in a Midnight zone
+    const blobs = questPOIBlobMap.get(entry.QuestID);
+    if (blobs && blobs.some(b => MIDNIGHT_MAP_IDS.has(b.UiMapID))) {
+      midnightQuestIds.add(entry.QuestID);
     }
   }
-
-  // Also detect from POI blobs — find UiMapIDs that appear in our quest data
-  // We'll use a broader approach: collect all UiMapIDs from quest POI blobs
-  const allUiMapIds = new Set<number>();
-  for (const blob of poiBlobs) {
-    if (blob.UiMapID) allUiMapIds.add(blob.UiMapID);
-  }
-
-  console.log(`Detected ${midnightMapIds.size} potential Midnight zone map IDs from AreaPOI.`);
-  if (midnightMapIds.size === 0) {
-    console.log('Could not auto-detect Midnight zones. Will include all quest line quests.');
-  }
+  console.log(`Identified ${midnightQuestIds.size} Midnight quests with POI data.`);
 
   // Build prerequisites from quest lines
   // Within a quest line, quest at OrderIndex N depends on quest at OrderIndex N-1
@@ -148,6 +244,7 @@ async function main() {
     for (let i = 1; i < entries.length; i++) {
       const current = entries[i].QuestID;
       const prev = entries[i - 1].QuestID;
+      if (!midnightQuestIds.has(current) || !midnightQuestIds.has(prev)) continue;
       if (!prerequisites.has(current)) {
         prerequisites.set(current, new Set());
       }
@@ -155,32 +252,28 @@ async function main() {
     }
   }
 
-  // Helper: get centroid of POI points for a quest blob
-  function getBlobCentroid(blob: RawQuestPOIBlob): Coord | null {
+  // Helpers
+  function getBlobCentroid(blob: RawPOIBlobRow): Coord | null {
     const points = blobPoints.get(blob._ID);
     if (!points || points.length === 0) return null;
 
-    const sumX = points.reduce((s, p) => s + p.X, 0);
-    const sumY = points.reduce((s, p) => s + p.Y, 0);
-    const sumZ = points.reduce((s, p) => s + p.Z, 0);
     const n = points.length;
-
     return {
-      x: sumX / n,
-      y: sumY / n,
-      z: sumZ / n,
+      x: points.reduce((s, p) => s + p.X, 0) / n,
+      y: points.reduce((s, p) => s + p.Y, 0) / n,
+      z: points.reduce((s, p) => s + p.Z, 0) / n,
       mapId: blob.UiMapID || blob.MapID,
     };
   }
 
-  // Helper: get quest locations from POI data
   function getQuestLocations(questId: number): {
     acceptLocation: Coord | null;
     turnInLocation: Coord | null;
     objectiveLocations: Coord[];
     mapId: number;
   } {
-    const blobs = questPOIBlobMap.get(questId) || [];
+    const blobs = (questPOIBlobMap.get(questId) || [])
+      .filter(b => MIDNIGHT_MAP_IDS.has(b.UiMapID));
     let acceptLocation: Coord | null = null;
     let turnInLocation: Coord | null = null;
     const objectiveLocations: Coord[] = [];
@@ -190,12 +283,9 @@ async function main() {
       const centroid = getBlobCentroid(blob);
       if (!centroid) continue;
 
-      if (!mapId) mapId = blob.UiMapID || blob.MapID;
+      if (!mapId) mapId = blob.UiMapID;
 
-      // ObjectiveIndex -1 typically means the quest giver/turn-in location
-      // ObjectiveIndex 0+ are objective locations
-      if (blob.ObjectiveIndex === -1 || blob.ObjectiveIndex === 255) {
-        // This is usually the accept/turn-in area
+      if (blob.ObjectiveIndex === -1) {
         if (!acceptLocation) acceptLocation = centroid;
         else turnInLocation = centroid;
       } else {
@@ -203,7 +293,6 @@ async function main() {
       }
     }
 
-    // If we only got one location from ObjectiveIndex -1, use it as both accept and turn-in
     if (acceptLocation && !turnInLocation) {
       turnInLocation = acceptLocation;
     }
@@ -211,15 +300,18 @@ async function main() {
     return { acceptLocation, turnInLocation, objectiveLocations, mapId };
   }
 
-  // Helper: determine zone name from mapId
-  function getZoneName(mapId: number): string {
-    // Try to find from AreaPOI
-    for (const poi of areaPOIs) {
-      if (poi.UiMapID === mapId) {
-        return poi.Name || poi.Name_lang || `Zone_${mapId}`;
-      }
-    }
-    return `Zone_${mapId}`;
+  // Determine quest line flags for campaign/story classification
+  // Flags interpretation (from observation):
+  // 8 = campaign/story, 72 = side quest, 24 = important/key, 0 = WQ/repeatables
+  function classifyFlags(lineId: number): { isCampaign: boolean; isLocalStory: boolean; isImportant: boolean } {
+    const info = questLineInfo.get(lineId);
+    if (!info) return { isCampaign: false, isLocalStory: false, isImportant: false };
+    const f = info.flags;
+    return {
+      isCampaign: (f & 8) !== 0 && (f & 64) === 0, // flag 8 without 64 = campaign
+      isLocalStory: (f & 64) !== 0, // flag 64 = side story
+      isImportant: (f & 16) !== 0, // flag 16 = important
+    };
   }
 
   // Build Quest objects
@@ -227,28 +319,39 @@ async function main() {
   const quests: Quest[] = [];
   const processedQuestIds = new Set<number>();
 
-  // Process all quests that appear in quest lines
+  // Track which quest line each quest first appears in
+  const questFirstLine = new Map<number, number>();
+  for (const entry of qlxq) {
+    if (midnightQuestIds.has(entry.QuestID) && !questFirstLine.has(entry.QuestID)) {
+      questFirstLine.set(entry.QuestID, entry.QuestLineID);
+    }
+  }
+
   for (const [lineId, entries] of lineEntries) {
-    const lineName = questLineNames.get(lineId) || `QuestLine_${lineId}`;
+    if (!MIDNIGHT_STORY_LINE_IDS.has(lineId)) continue;
+    const info = questLineInfo.get(lineId);
+    const lineName = info?.name || `QuestLine_${lineId}`;
+    const flags = classifyFlags(lineId);
 
     for (const entry of entries) {
+      if (!midnightQuestIds.has(entry.QuestID)) continue;
       if (processedQuestIds.has(entry.QuestID)) continue;
       processedQuestIds.add(entry.QuestID);
 
       const { acceptLocation, turnInLocation, objectiveLocations, mapId } =
         getQuestLocations(entry.QuestID);
 
-      // Get objectives
+      if (!mapId) continue; // Skip quests with no Midnight POI data
+
       const rawObjs = questObjectives.get(entry.QuestID) || [];
       const objs: Objective[] = rawObjs.map(o => ({
         index: o.OrderIndex,
         type: o.Type,
-        description: o.Description || '',
+        description: o.Description_lang || '',
         amount: o.Amount,
-        locations: [], // filled from POI data above via objectiveLocations
+        locations: [],
       }));
 
-      // Get API enrichment
       const api = apiData[entry.QuestID.toString()];
       const rewards: Rewards = {};
       if (api?.rewards) {
@@ -267,6 +370,7 @@ async function main() {
       }
 
       const prereqs = prerequisites.get(entry.QuestID);
+      const zoneName = MIDNIGHT_ZONES[mapId] || `Zone_${mapId}`;
 
       const quest: Quest = {
         id: entry.QuestID,
@@ -275,18 +379,14 @@ async function main() {
         questLineId: lineId,
         questLineName: lineName,
         orderIndex: entry.OrderIndex,
-        zone: mapId ? getZoneName(mapId) : 'Unknown',
+        zone: zoneName,
         mapId,
         acceptLocation,
         turnInLocation,
         objectiveLocations,
         objectives: objs,
         rewards,
-        flags: {
-          isCampaign: false, // will be set from addon data if available
-          isLocalStory: false,
-          isImportant: false,
-        },
+        flags,
         prerequisites: prereqs ? [...prereqs] : [],
         level: api?.requirements?.min_character_level,
       };
@@ -295,101 +395,88 @@ async function main() {
     }
   }
 
-  console.log(`Built ${quests.length} total quests from ${lineEntries.size} quest lines.`);
+  console.log(`Built ${quests.length} Midnight quests from story quest lines.`);
 
-  // Filter to Midnight zones if we detected any
-  let midnightQuests: Quest[];
-  if (midnightMapIds.size > 0) {
-    midnightQuests = quests.filter(q => midnightMapIds.has(q.mapId));
-    console.log(`Filtered to ${midnightQuests.length} Midnight quests.`);
-  } else {
-    // Without zone detection, output all quests — user can filter later
-    midnightQuests = quests;
-    console.log('No zone filtering applied — outputting all quests.');
+  // Zone breakdown
+  const zoneCounts: Record<string, number> = {};
+  for (const q of quests) {
+    zoneCounts[q.zone] = (zoneCounts[q.zone] || 0) + 1;
+  }
+  for (const [zone, count] of Object.entries(zoneCounts)) {
+    console.log(`  ${zone}: ${count} quests`);
   }
 
-  // Build extras from Vignette data (treasures, rares)
+  // Build extras from Vignette data
   console.log('\nBuilding extras...');
-  let extras: Extra[] = [];
-  try {
-    const vignettes = await loadJSON<{
-      _ID: number;
-      Name?: string;
-      Name_lang?: string;
-      QuestID?: number;
-      Flags?: number;
-      VisibleTrackingQuestID?: number;
-      UiMapID?: number;
-      X?: number;
-      Y?: number;
-    }[]>(join(RAW_DIR, 'vignette.json'));
+  const extras: Extra[] = [];
 
-    for (const v of vignettes) {
-      const name = v.Name || v.Name_lang || '';
-      if (!name) continue;
+  // Vignettes don't have coordinates directly — they reference tracking quests
+  // which may have POI data. For now, collect vignettes that have tracking quests
+  // which are in Midnight zones.
+  for (const v of vignettes) {
+    if (!v.Name_lang) continue;
+    const trackingQuestId = v.VisibleTrackingQuestID || v.RewardQuestID;
+    if (!trackingQuestId) continue;
 
-      // Classify: treasures have "treasure" or "chest" in name, rares are everything else with a tracking quest
-      let type: 'treasure' | 'rare' = 'rare';
-      const lower = name.toLowerCase();
-      if (lower.includes('treasure') || lower.includes('chest') || lower.includes('cache')) {
-        type = 'treasure';
-      }
+    // Check if tracking quest has POI in Midnight zones
+    const blobs = (questPOIBlobMap.get(trackingQuestId) || [])
+      .filter(b => MIDNIGHT_MAP_IDS.has(b.UiMapID));
+    if (blobs.length === 0) continue;
 
-      if (v.QuestID || v.VisibleTrackingQuestID) {
-        extras.push({
-          id: v._ID,
-          type,
-          name,
-          location: {
-            x: v.X || 0,
-            y: v.Y || 0,
-            mapId: v.UiMapID || 0,
-          },
-          trackingQuestId: v.VisibleTrackingQuestID || v.QuestID,
-          zone: v.UiMapID ? getZoneName(v.UiMapID) : 'Unknown',
-        });
-      }
+    const centroid = getBlobCentroid(blobs[0]);
+    if (!centroid) continue;
+
+    let type: Extra['type'] = 'rare';
+    const lower = v.Name_lang.toLowerCase();
+    if (lower.includes('treasure') || lower.includes('chest') || lower.includes('cache')) {
+      type = 'treasure';
+    } else if (lower.includes('glyph') || lower.includes('skyriding')) {
+      type = 'glyph';
     }
-  } catch {
-    console.warn('Could not load vignette data. Skipping extras.');
+
+    const zoneName = MIDNIGHT_ZONES[blobs[0].UiMapID] || `Zone_${blobs[0].UiMapID}`;
+
+    extras.push({
+      id: v._ID,
+      type,
+      name: v.Name_lang,
+      location: centroid,
+      trackingQuestId,
+      zone: zoneName,
+    });
   }
 
-  // TODO: Add glyphs from Achievement data when we have Midnight achievement IDs
-  console.log(`Built ${extras.length} extras (treasures + rares).`);
-
-  // Filter extras to Midnight zones
-  if (midnightMapIds.size > 0) {
-    extras = extras.filter(e => midnightMapIds.has(e.location.mapId));
-    console.log(`Filtered to ${extras.length} Midnight extras.`);
-  }
+  console.log(`Built ${extras.length} extras (treasures + rares + glyphs).`);
 
   // Write output
   const questsPath = join(OUTPUT_DIR, 'quests.json');
   const extrasPath = join(OUTPUT_DIR, 'extras.json');
   const statsPath = join(OUTPUT_DIR, 'stats.json');
 
-  await writeFile(questsPath, JSON.stringify(midnightQuests, null, 2));
+  await writeFile(questsPath, JSON.stringify(quests, null, 2));
   await writeFile(extrasPath, JSON.stringify(extras, null, 2));
 
-  // Compute stats
-  const zones = new Set(midnightQuests.map(q => q.zone));
+  const zones = new Set(quests.map(q => q.zone));
   const stats = {
-    totalQuests: midnightQuests.length,
+    totalQuests: quests.length,
     totalExtras: extras.length,
     zones: [...zones],
-    questLines: [...new Set(midnightQuests.map(q => q.questLineName))],
-    questsWithLocations: midnightQuests.filter(q => q.acceptLocation).length,
-    questsWithRewards: midnightQuests.filter(q => q.rewards.xp || q.rewards.gold).length,
+    questLines: [...new Set(quests.map(q => q.questLineName))],
+    questsWithLocations: quests.filter(q => q.acceptLocation).length,
+    questsWithRewards: quests.filter(q => q.rewards.xp || q.rewards.gold).length,
+    campaignQuests: quests.filter(q => q.flags.isCampaign).length,
+    sideStoryQuests: quests.filter(q => q.flags.isLocalStory).length,
   };
   await writeFile(statsPath, JSON.stringify(stats, null, 2));
 
   console.log(`\nOutput:`);
-  console.log(`  ${questsPath} (${midnightQuests.length} quests)`);
+  console.log(`  ${questsPath} (${quests.length} quests)`);
   console.log(`  ${extrasPath} (${extras.length} extras)`);
   console.log(`  ${statsPath}`);
   console.log(`\nZones: ${[...zones].join(', ')}`);
   console.log(`Quest lines: ${stats.questLines.length}`);
-  console.log(`Quests with locations: ${stats.questsWithLocations}/${midnightQuests.length}`);
+  console.log(`Campaign: ${stats.campaignQuests}, Side stories: ${stats.sideStoryQuests}`);
+  console.log(`Quests with locations: ${stats.questsWithLocations}/${quests.length}`);
 }
 
 main().catch(err => {
