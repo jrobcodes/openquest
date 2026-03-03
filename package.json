@@ -1,0 +1,22 @@
+{
+  "name": "openquest",
+  "version": "0.1.0",
+  "description": "Free, algorithmically-optimized WoW questing guide",
+  "type": "module",
+  "scripts": {
+    "extract:casc": "tsx extract/casc-extract.ts",
+    "extract:api": "tsx extract/blizzard-api.ts",
+    "extract:merge": "tsx extract/merge.ts",
+    "extract": "tsx extract/casc-extract.ts && tsx extract/blizzard-api.ts && tsx extract/merge.ts",
+    "route": "tsx router/index.ts",
+    "build": "npm run extract && npm run route"
+  },
+  "dependencies": {
+    "@rhyster/wow-casc-dbc": "^2.12.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
