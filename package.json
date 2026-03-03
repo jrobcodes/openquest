@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "extract:casc": "tsx extract/casc-extract.ts",
-    "extract:api": "tsx extract/blizzard-api.ts",
+    "extract:api": "tsx --env-file=.env extract/blizzard-api.ts",
     "extract:merge": "tsx extract/merge.ts",
     "extract": "tsx extract/casc-extract.ts && tsx extract/blizzard-api.ts && tsx extract/merge.ts",
     "route": "tsx router/index.ts",

@@ -12,8 +12,8 @@ const ENRICHED_DIR = join(import.meta.dirname, '..', 'data', 'enriched');
 const CACHE_PATH = join(ENRICHED_DIR, 'api-cache.json');
 
 // Blizzard API credentials
-const CLIENT_ID = '6889bf5dd1064fdab7e0faa6e12e28c0';
-const CLIENT_SECRET = 'Cs3zBMksLYXREBj65vA5c5hXBOBpgSMi';
+const CLIENT_ID = process.env.BLIZZARD_CLIENT_ID || '';
+const CLIENT_SECRET = process.env.BLIZZARD_CLIENT_SECRET || '';
 
 const API_BASE = 'https://us.api.blizzard.com';
 const NAMESPACE = 'static-us'; // will be overridden with specific build if needed
@@ -35,17 +35,20 @@ async function getAccessToken(): Promise<string> {
   if (accessToken) return accessToken;
 
   console.log('Authenticating with Blizzard API...');
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+  });
   const resp = await fetch('https://oauth.battle.net/token', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-    },
-    body: 'grant_type=client_credentials',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
   });
 
   if (!resp.ok) {
-    throw new Error(`Auth failed: ${resp.status} ${resp.statusText}`);
+    const text = await resp.text();
+    throw new Error(`Auth failed: ${resp.status} ${resp.statusText} — ${text}`);
   }
 
   const data = (await resp.json()) as TokenResponse;
