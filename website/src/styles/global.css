@@ -8,6 +8,45 @@
   --color-midnight-500: #38326e;
   --color-gold-400: #fbbf24;
   --color-gold-500: #f59e0b;
+  --color-gold-300: #fcd34d;
   --color-arcane-400: #a78bfa;
   --color-arcane-500: #8b5cf6;
+  --color-arcane-300: #c4b5fd;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #151230;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2557;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #38326e;
+}
+
+/* Leaflet popup override for dark theme */
+.leaflet-popup-content-wrapper {
+  background: #1e1a44 !important;
+  border: 1px solid #2a2557 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+.leaflet-popup-content {
+  color: #e5e7eb !important;
+  margin: 10px 14px !important;
+}
+.leaflet-popup-tip {
+  background: #1e1a44 !important;
+  border: 1px solid #2a2557 !important;
 }

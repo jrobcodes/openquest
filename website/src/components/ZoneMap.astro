@@ -9,36 +9,41 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <div id="zone-map-app" data-zone-key={zoneKey} data-zone-name={zoneName} data-base={base}>
-  <div class="flex flex-col lg:flex-row gap-4 h-[calc(100vh-12rem)]">
+  <div class="flex flex-col lg:flex-row gap-4 h-[calc(100vh-11rem)]">
     <!-- Map -->
     <div class="flex-1 relative">
-      <div id="map" class="w-full h-full rounded-lg border border-midnight-600 bg-midnight-700"></div>
+      <div id="map" class="w-full h-full rounded-xl border border-midnight-600/50 bg-midnight-800"></div>
       <!-- Filters -->
-      <div class="absolute top-3 right-3 z-[1000] bg-midnight-800/90 border border-midnight-600 rounded-lg p-3 space-y-2 text-sm">
-        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
-          <input type="checkbox" id="filter-campaign" checked class="accent-gold-400" />
+      <div class="absolute top-3 right-3 z-[1000] bg-midnight-800/95 backdrop-blur-sm border border-midnight-600/50 rounded-xl p-3 space-y-2 text-sm shadow-lg">
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white transition-colors">
+          <input type="checkbox" id="filter-campaign" checked class="accent-gold-400 rounded" />
+          <span class="w-2 h-2 bg-green-500 rounded-full"></span>
           Campaign
         </label>
-        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
-          <input type="checkbox" id="filter-side" checked class="accent-arcane-400" />
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white transition-colors">
+          <input type="checkbox" id="filter-side" checked class="accent-arcane-400 rounded" />
+          <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
           Side Quests
         </label>
-        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
-          <input type="checkbox" id="filter-extras" checked class="accent-purple-400" />
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer hover:text-white transition-colors">
+          <input type="checkbox" id="filter-extras" checked class="accent-purple-400 rounded" />
+          <span class="w-2 h-2 bg-purple-400 rounded-full"></span>
           Extras
         </label>
-        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
-          <input type="checkbox" id="filter-route" checked class="accent-gray-400" />
-          Route Lines
-        </label>
+        <div class="border-t border-midnight-600/50 pt-2">
+          <label class="flex items-center gap-2 text-gray-400 cursor-pointer hover:text-white transition-colors">
+            <input type="checkbox" id="filter-route" checked class="accent-gray-400 rounded" />
+            Route Lines
+          </label>
+        </div>
       </div>
     </div>
 
     <!-- Step list sidebar -->
-    <div class="lg:w-80 h-64 lg:h-full overflow-y-auto bg-midnight-700 border border-midnight-600 rounded-lg">
-      <div class="sticky top-0 bg-midnight-700 p-3 border-b border-midnight-600">
+    <div class="lg:w-80 h-64 lg:h-full overflow-y-auto bg-midnight-800/60 border border-midnight-600/50 rounded-xl">
+      <div class="sticky top-0 bg-midnight-800 p-3.5 border-b border-midnight-600/50 z-10">
         <h3 class="text-white font-semibold text-sm">Route Steps</h3>
-        <p id="step-count" class="text-gray-500 text-xs"></p>
+        <p id="step-count" class="text-gray-600 text-xs mt-0.5"></p>
       </div>
       <div id="step-list" class="p-2 space-y-0.5"></div>
     </div>
@@ -155,11 +160,11 @@ const base = import.meta.env.BASE_URL;
       }).addTo(map);
 
       marker.bindPopup(`
-        <div style="color:#000;min-width:150px">
-          <strong>${step.description}</strong><br/>
-          <span style="color:#666">Step ${step.stepNumber}</span>
-          ${step.npcName ? `<br/><span style="color:#666">NPC: ${step.npcName}</span>` : ''}
-          ${step.questTitle ? `<br/><span style="color:#666">${step.questTitle}</span>` : ''}
+        <div style="min-width:160px">
+          <strong style="color:#fff">${step.description}</strong><br/>
+          <span style="color:#9ca3af;font-size:12px">Step ${step.stepNumber}</span>
+          ${step.npcName ? `<br/><span style="color:#9ca3af;font-size:12px">NPC: ${step.npcName}</span>` : ''}
+          ${step.questTitle ? `<br/><span style="color:#a78bfa;font-size:12px">${step.questTitle}</span>` : ''}
         </div>
       `);
 
@@ -175,9 +180,9 @@ const base = import.meta.env.BASE_URL;
       const color = actionColors[step.action] ?? '#6b7280';
       const icon = actionIcons[step.action] ?? '?';
       return `
-        <button class="step-item w-full text-left px-2 py-1.5 rounded text-xs hover:bg-midnight-600 transition-colors flex items-center gap-2" data-index="${i}">
+        <button class="step-item w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-midnight-700/60 transition-colors flex items-center gap-2.5" data-index="${i}">
           <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style="background:${color};color:#000">${icon}</span>
-          <span class="text-gray-300 truncate">${step.description}</span>
+          <span class="text-gray-400 truncate hover:text-gray-200">${step.description}</span>
         </button>
       `;
     }).join('');

@@ -5,16 +5,21 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <div id="quest-table-app" data-base={base}>
-  <div class="flex flex-col sm:flex-row gap-4 mb-6">
-    <input
-      id="quest-search"
-      type="text"
-      placeholder="Search quests..."
-      class="flex-1 bg-midnight-700 border border-midnight-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-arcane-400"
-    />
+  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <div class="flex-1 relative">
+      <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        id="quest-search"
+        type="text"
+        placeholder="Search quests..."
+        class="w-full bg-midnight-800/60 border border-midnight-600/50 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-gray-600 focus:outline-none focus:border-arcane-400/50 transition-colors text-sm"
+      />
+    </div>
     <select
       id="quest-zone-filter"
-      class="bg-midnight-700 border border-midnight-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-arcane-400"
+      class="bg-midnight-800/60 border border-midnight-600/50 rounded-xl px-4 py-2.5 text-gray-300 focus:outline-none focus:border-arcane-400/50 transition-colors text-sm"
     >
       <option value="">All Zones</option>
       <option value="Voidstorm">Voidstorm</option>
@@ -24,7 +29,7 @@ const base = import.meta.env.BASE_URL;
     </select>
     <select
       id="quest-type-filter"
-      class="bg-midnight-700 border border-midnight-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-arcane-400"
+      class="bg-midnight-800/60 border border-midnight-600/50 rounded-xl px-4 py-2.5 text-gray-300 focus:outline-none focus:border-arcane-400/50 transition-colors text-sm"
     >
       <option value="">All Types</option>
       <option value="campaign">Campaign</option>
@@ -33,24 +38,24 @@ const base = import.meta.env.BASE_URL;
     </select>
   </div>
 
-  <div class="text-sm text-gray-400 mb-3" id="quest-count"></div>
+  <div class="text-xs text-gray-600 mb-3" id="quest-count"></div>
 
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto bg-midnight-800/30 border border-midnight-600/30 rounded-xl">
     <table class="w-full text-left">
       <thead>
-        <tr class="border-b border-midnight-600 text-gray-400 text-sm">
-          <th class="pb-3 pr-4">Quest</th>
-          <th class="pb-3 pr-4 hidden sm:table-cell">Zone</th>
-          <th class="pb-3 pr-4 hidden md:table-cell">Quest Line</th>
-          <th class="pb-3 pr-4 hidden md:table-cell">Type</th>
-          <th class="pb-3">Level</th>
+        <tr class="border-b border-midnight-600/50 text-gray-500 text-xs uppercase tracking-wider">
+          <th class="py-3 px-4">Quest</th>
+          <th class="py-3 px-4 hidden sm:table-cell">Zone</th>
+          <th class="py-3 px-4 hidden md:table-cell">Quest Line</th>
+          <th class="py-3 px-4 hidden md:table-cell">Type</th>
+          <th class="py-3 px-4">Level</th>
         </tr>
       </thead>
       <tbody id="quest-tbody" class="text-sm"></tbody>
     </table>
   </div>
 
-  <div id="quest-detail" class="hidden mt-6 bg-midnight-700 border border-midnight-600 rounded-lg p-6"></div>
+  <div id="quest-detail" class="hidden mt-6 bg-midnight-700/50 border border-midnight-600/50 rounded-xl p-6"></div>
 </div>
 
 <script>
@@ -94,10 +99,10 @@ const base = import.meta.env.BASE_URL;
   }
 
   function getTypeBadgeClass(q: Quest): string {
-    if (q.flags.isCampaign) return 'bg-gold-400/20 text-gold-400';
-    if (q.flags.isLocalStory) return 'bg-arcane-400/20 text-arcane-400';
-    if (q.flags.isImportant) return 'bg-blue-400/20 text-blue-400';
-    return 'bg-gray-600/20 text-gray-400';
+    if (q.flags.isCampaign) return 'bg-gold-400/15 text-gold-400 border border-gold-400/20';
+    if (q.flags.isLocalStory) return 'bg-arcane-400/15 text-arcane-400 border border-arcane-400/20';
+    if (q.flags.isImportant) return 'bg-blue-400/15 text-blue-400 border border-blue-400/20';
+    return 'bg-gray-600/15 text-gray-500 border border-gray-600/20';
   }
 
   function matchesFilters(q: Quest): boolean {
@@ -119,22 +124,22 @@ const base = import.meta.env.BASE_URL;
     countEl.textContent = `Showing ${filtered.length} of ${allQuests.length} quests`;
 
     tbody.innerHTML = filtered.slice(0, 100).map(q => `
-      <tr class="border-b border-midnight-600/50 hover:bg-midnight-700 cursor-pointer quest-row" data-id="${q.id}">
-        <td class="py-2.5 pr-4">
+      <tr class="border-b border-midnight-600/20 hover:bg-midnight-700/30 cursor-pointer quest-row transition-colors" data-id="${q.id}">
+        <td class="py-3 px-4">
           <span class="text-white">${q.title}</span>
-          <span class="text-gray-500 text-xs ml-1">#${q.id}</span>
+          <span class="text-gray-600 text-xs ml-1.5">#${q.id}</span>
         </td>
-        <td class="py-2.5 pr-4 text-gray-400 hidden sm:table-cell">${q.zone}</td>
-        <td class="py-2.5 pr-4 text-gray-400 hidden md:table-cell">${q.questLineName}</td>
-        <td class="py-2.5 pr-4 hidden md:table-cell">
-          ${getTypeLabel(q) ? `<span class="text-xs px-2 py-0.5 rounded-full ${getTypeBadgeClass(q)}">${getTypeLabel(q)}</span>` : ''}
+        <td class="py-3 px-4 text-gray-500 hidden sm:table-cell">${q.zone}</td>
+        <td class="py-3 px-4 text-gray-500 hidden md:table-cell">${q.questLineName}</td>
+        <td class="py-3 px-4 hidden md:table-cell">
+          ${getTypeLabel(q) ? `<span class="text-xs px-2 py-0.5 rounded-md ${getTypeBadgeClass(q)}">${getTypeLabel(q)}</span>` : ''}
         </td>
-        <td class="py-2.5 text-gray-400">${q.level ?? ''}</td>
+        <td class="py-3 px-4 text-gray-500">${q.level ?? ''}</td>
       </tr>
     `).join('');
 
     if (filtered.length > 100) {
-      tbody.innerHTML += `<tr><td colspan="5" class="py-4 text-center text-gray-500">Showing first 100 of ${filtered.length} results. Refine your search to see more.</td></tr>`;
+      tbody.innerHTML += `<tr><td colspan="5" class="py-6 text-center text-gray-600 text-sm">Showing first 100 of ${filtered.length} results. Refine your search to see more.</td></tr>`;
     }
 
     // Add click handlers
@@ -153,26 +158,26 @@ const base = import.meta.env.BASE_URL;
       <div class="flex justify-between items-start mb-4">
         <div>
           <h3 class="text-xl font-semibold text-white">${q.title}</h3>
-          <p class="text-gray-400 text-sm">${q.questLineName} &middot; ${q.zone} &middot; Level ${q.level ?? '?'}</p>
+          <p class="text-gray-500 text-sm mt-1">${q.questLineName} &middot; ${q.zone} &middot; Level ${q.level ?? '?'}</p>
         </div>
-        <button id="close-detail" class="text-gray-400 hover:text-white text-xl">&times;</button>
+        <button id="close-detail" class="text-gray-600 hover:text-white text-xl transition-colors">&times;</button>
       </div>
-      <p class="text-gray-300 text-sm mb-4">${q.description.replace(/\r\n/g, '<br>')}</p>
+      <p class="text-gray-400 text-sm mb-4 leading-relaxed">${q.description.replace(/\r\n/g, '<br>')}</p>
       ${q.objectives.length ? `
         <div class="mb-4">
-          <h4 class="text-sm font-medium text-gray-400 mb-1">Objectives</h4>
-          <ul class="text-sm text-gray-300 list-disc list-inside">
-            ${q.objectives.map(o => `<li>${o.description}${o.amount > 1 ? ` (${o.amount})` : ''}</li>`).join('')}
+          <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Objectives</h4>
+          <ul class="text-sm text-gray-300 space-y-1">
+            ${q.objectives.map(o => `<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-gold-400 rounded-full shrink-0"></span>${o.description}${o.amount > 1 ? ` (${o.amount})` : ''}</li>`).join('')}
           </ul>
         </div>
       ` : ''}
-      <div class="flex flex-wrap gap-4 text-sm text-gray-400">
-        ${q.acceptNpcName ? `<span>Accept: <span class="text-white">${q.acceptNpcName}</span></span>` : ''}
-        ${q.turnInNpcName ? `<span>Turn in: <span class="text-white">${q.turnInNpcName}</span></span>` : ''}
-        ${q.rewards.xp ? `<span>XP: <span class="text-white">${q.rewards.xp.toLocaleString()}</span></span>` : ''}
-        ${q.rewards.gold ? `<span>Gold: <span class="text-white">${(q.rewards.gold / 10000).toFixed(1)}g</span></span>` : ''}
+      <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+        ${q.acceptNpcName ? `<span>Accept: <span class="text-gray-300">${q.acceptNpcName}</span></span>` : ''}
+        ${q.turnInNpcName ? `<span>Turn in: <span class="text-gray-300">${q.turnInNpcName}</span></span>` : ''}
+        ${q.rewards.xp ? `<span>XP: <span class="text-gray-300">${q.rewards.xp.toLocaleString()}</span></span>` : ''}
+        ${q.rewards.gold ? `<span>Gold: <span class="text-gray-300">${(q.rewards.gold / 10000).toFixed(1)}g</span></span>` : ''}
       </div>
-      ${zoneKey ? `<a href="${base}map/${zoneKey}" class="inline-block mt-4 text-sm text-arcane-400 hover:text-arcane-500">View on map &#x2192;</a>` : ''}
+      ${zoneKey ? `<a href="${base}map/${zoneKey}" class="inline-block mt-4 text-sm text-arcane-400 hover:text-arcane-300 transition-colors">View on map &rarr;</a>` : ''}
     `;
     detailEl.classList.remove('hidden');
     detailEl.querySelector('#close-detail')?.addEventListener('click', () => detailEl.classList.add('hidden'));
