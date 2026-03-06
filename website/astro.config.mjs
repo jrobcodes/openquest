@@ -5,6 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://jrobcodes.github.io',
+  base: '/openquest',
   vite: {
     plugins: [tailwindcss()]
   }

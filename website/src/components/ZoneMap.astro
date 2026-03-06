@@ -5,9 +5,10 @@ interface Props {
 }
 
 const { zoneKey, zoneName } = Astro.props;
+const base = import.meta.env.BASE_URL;
 ---
 
-<div id="zone-map-app" data-zone-key={zoneKey} data-zone-name={zoneName}>
+<div id="zone-map-app" data-zone-key={zoneKey} data-zone-name={zoneName} data-base={base}>
   <div class="flex flex-col lg:flex-row gap-4 h-[calc(100vh-12rem)]">
     <!-- Map -->
     <div class="flex-1 relative">
@@ -66,6 +67,7 @@ const { zoneKey, zoneName } = Astro.props;
 
   const app = document.getElementById('zone-map-app')!;
   const zoneName = app.dataset.zoneName!;
+  const base = app.dataset.base || '';
 
   const actionColors: Record<string, string> = {
     accept: '#22c55e',
@@ -97,7 +99,7 @@ const { zoneKey, zoneName } = Astro.props;
 
   // Try to load zone map image as overlay
   const zoneKey = app.dataset.zoneKey!;
-  const imageUrl = `/maps/${zoneKey}.png`;
+  const imageUrl = `${base}maps/${zoneKey}.png`;
   L.imageOverlay(imageUrl, bounds).addTo(map);
 
   let allSteps: GuideStep[] = [];
@@ -105,7 +107,7 @@ const { zoneKey, zoneName } = Astro.props;
   let routeLine: L.Polyline | null = null;
 
   async function loadData() {
-    const res = await fetch('/data/guide-full.json');
+    const res = await fetch(`${base}data/guide-full.json`);
     const guide: GuideStep[] = await res.json();
     allSteps = guide.filter(s => s.zone === zoneName && s.mapX != null && s.mapY != null);
     render();

@@ -1,9 +1,10 @@
 ---
 // QuestTable is a client-side interactive component
 // Data is loaded via fetch in the browser
+const base = import.meta.env.BASE_URL;
 ---
 
-<div id="quest-table-app">
+<div id="quest-table-app" data-base={base}>
   <div class="flex flex-col sm:flex-row gap-4 mb-6">
     <input
       id="quest-search"
@@ -77,8 +78,10 @@
   const countEl = document.getElementById('quest-count')!;
   const detailEl = document.getElementById('quest-detail')!;
 
+  const base = document.getElementById('quest-table-app')!.dataset.base || '';
+
   async function loadQuests() {
-    const res = await fetch('/data/quests.json');
+    const res = await fetch(`${base}data/quests.json`);
     allQuests = await res.json();
     render();
   }
@@ -169,7 +172,7 @@
         ${q.rewards.xp ? `<span>XP: <span class="text-white">${q.rewards.xp.toLocaleString()}</span></span>` : ''}
         ${q.rewards.gold ? `<span>Gold: <span class="text-white">${(q.rewards.gold / 10000).toFixed(1)}g</span></span>` : ''}
       </div>
-      ${zoneKey ? `<a href="/map/${zoneKey}" class="inline-block mt-4 text-sm text-arcane-400 hover:text-arcane-500">View on map &#x2192;</a>` : ''}
+      ${zoneKey ? `<a href="${base}map/${zoneKey}" class="inline-block mt-4 text-sm text-arcane-400 hover:text-arcane-500">View on map &#x2192;</a>` : ''}
     `;
     detailEl.classList.remove('hidden');
     detailEl.querySelector('#close-detail')?.addEventListener('click', () => detailEl.classList.add('hidden'));
