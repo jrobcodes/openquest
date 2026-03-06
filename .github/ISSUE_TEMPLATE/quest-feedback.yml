@@ -1,0 +1,52 @@
+name: Quest Feedback
+description: Report an issue with a quest in the guide
+title: "Quest: "
+labels: ["quest-feedback"]
+body:
+  - type: input
+    id: quest-id
+    attributes:
+      label: Quest ID
+      description: The numeric quest ID
+      placeholder: "86549"
+    validations:
+      required: true
+  - type: input
+    id: quest-title
+    attributes:
+      label: Quest Title
+      placeholder: "No Fear of the Dark"
+    validations:
+      required: true
+  - type: dropdown
+    id: zone
+    attributes:
+      label: Zone
+      options:
+        - Voidstorm
+        - Eversong Woods
+        - "Zul'Aman"
+        - Harandar
+    validations:
+      required: true
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      options:
+        - Wrong location
+        - Missing NPC
+        - Wrong step order
+        - Missing prerequisite
+        - Bad description
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What went wrong and what should happen instead?
+      placeholder: "The quest accept location points to the wrong NPC..."
+    validations:
+      required: true

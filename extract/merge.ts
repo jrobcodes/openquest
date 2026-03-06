@@ -23,6 +23,21 @@ const MIDNIGHT_ZONES: Record<number, string> = {
 };
 const MIDNIGHT_MAP_IDS = new Set(Object.keys(MIDNIGHT_ZONES).map(Number));
 
+// Sub-maps that belong to a parent Midnight zone (same world space, different UI map page)
+const SUB_MAP_PARENTS: Record<number, number> = {
+  2393: 2395, // Silvermoon City → Eversong Woods
+  2424: 2395, // Isle of Quel'Danas → Eversong Woods
+  2444: 2405, // Voidstorm sub-zone
+  2527: 2405, // Voidstorm interior
+  2576: 2413, // Harandar sub-zone
+};
+
+/** Resolve a mapId to its parent Midnight zone, or return it if it's already a main zone. */
+function resolveParentZone(mapId: number): number | null {
+  if (MIDNIGHT_MAP_IDS.has(mapId)) return mapId;
+  return SUB_MAP_PARENTS[mapId] ?? null;
+}
+
 // Quest line IDs that belong to Midnight (identified from DB2 data)
 // Includes main story, side stories, and zone content — excludes WQ/repeatables
 const MIDNIGHT_STORY_LINE_IDS = new Set([
@@ -165,6 +180,8 @@ async function main() {
   const poiBlobs = await loadJSON<RawPOIBlobRow[]>(join(RAW_DIR, 'questpoiblob.json'));
   const poiPoints = await loadJSON<RawPOIPointRow[]>(join(RAW_DIR, 'questpoipoint.json'));
   const vignettes = await loadJSON<RawVignetteRow[]>(join(RAW_DIR, 'vignette.json'));
+  const creatures: any[] = await loadJSON<any[]>(join(RAW_DIR, 'creature.json')).catch(() => []);
+  const questOffers: any[] = await loadJSON<any[]>(join(RAW_DIR, 'questoffer.json')).catch(() => []);
 
   // Load enriched API data
   console.log('Loading API enrichment data...');
@@ -222,6 +239,44 @@ async function main() {
       blobPoints.set(pt.QuestPOIBlobID, []);
     }
     blobPoints.get(pt.QuestPOIBlobID)!.push(pt);
+  }
+
+  // Creature name lookup
+  const creatureNames = new Map<number, string>();
+  for (const c of creatures) {
+    if (c._ID && c.Name_lang) creatureNames.set(c._ID, c.Name_lang);
+  }
+
+  // Quest → accept NPC lookup (from DB2 questoffer if available)
+  const questAcceptNpc = new Map<number, number>();
+  const questTurnInNpc = new Map<number, number>();
+  const questAcceptNpcName = new Map<number, string>();
+  const questTurnInNpcName = new Map<number, string>();
+  for (const qo of questOffers) {
+    if (qo.QuestID && qo.CreatureID) {
+      questAcceptNpc.set(qo.QuestID, qo.CreatureID);
+    }
+  }
+
+  // Wowhead NPC data fallback (scraped quest giver/ender names)
+  const wowheadNpcs: any[] = await loadJSON(join(ENRICHED_DIR, 'quest-npcs.json')).catch(() => []);
+  for (const wn of wowheadNpcs) {
+    if (wn.questId && wn.startNpcId && !questAcceptNpc.has(wn.questId)) {
+      questAcceptNpc.set(wn.questId, wn.startNpcId);
+    }
+    if (wn.questId && wn.endNpcId && !questTurnInNpc.has(wn.questId)) {
+      questTurnInNpc.set(wn.questId, wn.endNpcId);
+    }
+    if (wn.questId && wn.startNpcName) {
+      questAcceptNpcName.set(wn.questId, wn.startNpcName);
+    }
+    if (wn.questId && wn.endNpcName) {
+      questTurnInNpcName.set(wn.questId, wn.endNpcName);
+    }
+  }
+  if (wowheadNpcs.length > 0) {
+    const named = wowheadNpcs.filter((w: any) => w.startNpcName).length;
+    console.log(`  Loaded ${wowheadNpcs.length} Wowhead NPC entries (${named} with names).`);
   }
 
   // Find which quest IDs belong to Midnight (in a Midnight quest line AND have POI in Midnight zones)
@@ -357,20 +412,33 @@ async function main() {
       if (api?.rewards) {
         rewards.xp = api.rewards.experience;
         rewards.gold = api.rewards.money?.value;
-        rewards.items = api.rewards.items?.map(i => ({
-          id: i.item.id,
-          name: i.item.name,
-          quantity: i.quantity,
-        }));
-        rewards.reputation = api.rewards.reputations?.map(r => ({
-          factionId: r.reward.id,
-          factionName: r.reward.name,
+        const itemsList = api.rewards.items;
+        if (itemsList) {
+          const all = [
+            ...(Array.isArray(itemsList) ? itemsList : []),
+            ...(itemsList.choice_of || []),
+            ...(itemsList.reward || []),
+          ];
+          if (all.length > 0) {
+            rewards.items = all.map((i: any) => ({
+              id: i.item?.id,
+              name: i.item?.name,
+              quantity: i.quantity || 1,
+            }));
+          }
+        }
+        rewards.reputation = api.rewards.reputations?.map((r: any) => ({
+          factionId: r.reward?.id,
+          factionName: r.reward?.name,
           amount: r.value,
         }));
       }
 
       const prereqs = prerequisites.get(entry.QuestID);
       const zoneName = MIDNIGHT_ZONES[mapId] || `Zone_${mapId}`;
+
+      const acceptNpcId = questAcceptNpc.get(entry.QuestID);
+      const turnInNpcId = questTurnInNpc.get(entry.QuestID);
 
       const quest: Quest = {
         id: entry.QuestID,
@@ -389,6 +457,12 @@ async function main() {
         flags,
         prerequisites: prereqs ? [...prereqs] : [],
         level: api?.requirements?.min_character_level,
+        acceptNpcId: acceptNpcId || undefined,
+        acceptNpcName: (acceptNpcId ? creatureNames.get(acceptNpcId) : undefined)
+          || questAcceptNpcName.get(entry.QuestID),
+        turnInNpcId: turnInNpcId || undefined,
+        turnInNpcName: (turnInNpcId ? creatureNames.get(turnInNpcId) : undefined)
+          || questTurnInNpcName.get(entry.QuestID),
       };
 
       quests.push(quest);
@@ -446,7 +520,55 @@ async function main() {
     });
   }
 
-  console.log(`Built ${extras.length} extras (treasures + rares + glyphs).`);
+  console.log(`Built ${extras.length} extras from vignette POI data.`);
+
+  // Vignette name lookup by quest ID (for overriding placeholder names)
+  const vignetteNameByQuest = new Map<number, string>();
+  for (const v of vignettes) {
+    if (v.VisibleTrackingQuestID && v.Name_lang) vignetteNameByQuest.set(v.VisibleTrackingQuestID, v.Name_lang);
+    if (v.RewardQuestID && v.Name_lang) vignetteNameByQuest.set(v.RewardQuestID, v.Name_lang);
+  }
+
+  // Import HandyNotes extras (glyphs, rares, treasures with world coordinates)
+  const HANDYNOTES_DIR = join(import.meta.dirname, '..', 'data', 'handynotes');
+  try {
+    const hnExtras: any[] = JSON.parse(await readFile(join(HANDYNOTES_DIR, 'extras.json'), 'utf-8'));
+    // Only add HandyNotes extras for Midnight zones, avoid duplicates with vignette data
+    const existingQuestIds = new Set(extras.map(e => e.trackingQuestId).filter(Boolean));
+    let added = 0;
+    let subMapResolved = 0;
+    for (const hn of hnExtras) {
+      const parentZone = resolveParentZone(hn.mapId);
+      if (!parentZone) continue;
+      // Skip if we already have this via vignette tracking quest
+      if (hn.questId && existingQuestIds.has(hn.questId)) continue;
+
+      const isSubMap = parentZone !== hn.mapId;
+      if (isSubMap) subMapResolved++;
+
+      const extra: Extra = {
+        id: hn.questId || hn.achievementId || 100000 + added,
+        type: hn.type,
+        name: hn.name,
+        location: { ...hn.location, mapId: parentZone },
+        trackingQuestId: hn.questId,
+        zone: MIDNIGHT_ZONES[parentZone],
+      };
+
+      // If the extra has a questId and a placeholder name, try vignette lookup
+      if (extra.trackingQuestId && vignetteNameByQuest.has(extra.trackingQuestId)) {
+        extra.name = vignetteNameByQuest.get(extra.trackingQuestId)!;
+      }
+
+      extras.push(extra);
+      added++;
+    }
+    console.log(`Added ${added} extras from HandyNotes data (${subMapResolved} resolved from sub-maps).`);
+  } catch {
+    console.log('No HandyNotes data found. Run: npx tsx scripts/import-handynotes.ts');
+  }
+
+  console.log(`Total extras: ${extras.length}`);
 
   // Write output
   const questsPath = join(OUTPUT_DIR, 'quests.json');

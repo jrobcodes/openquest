@@ -44,6 +44,10 @@ export interface Quest {
   prerequisites: number[]; // quest IDs that must complete first
   level?: number;
   questType?: number;
+  acceptNpcId?: number;
+  acceptNpcName?: string;
+  turnInNpcId?: number;
+  turnInNpcName?: string;
 }
 
 export interface Extra {
@@ -66,6 +70,17 @@ export interface GuideStep {
   mapId: number;
   zone: string;
   extraType?: 'glyph' | 'treasure' | 'rare';
+  npcName?: string;
+  trackingQuestId?: number; // for extras: hidden quest that tracks completion
+  mapX?: number; // normalized 0-1 map coordinate
+  mapY?: number; // normalized 0-1 map coordinate
+  level?: number; // required player level
+  isCampaign?: boolean;
+}
+
+export interface UiMapRegion {
+  UiMapID: number;
+  Region: [number, number, number, number, number, number]; // [minX, minY, zMin, maxX, maxY, zMax]
 }
 
 // DAG types

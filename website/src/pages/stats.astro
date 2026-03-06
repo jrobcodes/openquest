@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StatsCard from '../components/StatsCard.astro';
+import { zones, zoneNameToKey } from '../lib/map-config';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const dataDir = path.join(process.cwd(), 'public/data');
+
+let guideStats: any = {};
+let stats: any = {};
+
+try {
+  guideStats = JSON.parse(fs.readFileSync(path.join(dataDir, 'guide-full-stats.json'), 'utf-8'));
+  stats = JSON.parse(fs.readFileSync(path.join(dataDir, 'stats.json'), 'utf-8'));
+} catch {
+  // Data not synced yet
+}
+
+const totalQuests = stats.totalQuests ?? 0;
+const totalExtras = stats.totalExtras ?? 0;
+const campaignQuests = stats.campaignQuests ?? 0;
+const sideStoryQuests = stats.sideStoryQuests ?? 0;
+const questLines = stats.questLines ?? [];
+const distanceSavings = guideStats.vsNaivePct ?? 0;
+const totalSteps = guideStats.totalSteps ?? 0;
+const glyphs = guideStats.extras?.glyphs ?? 0;
+const treasures = guideStats.extras?.treasures ?? 0;
+const rares = guideStats.extras?.rares ?? 0;
+---
+
+<Layout title="Stats">
+  <div class="max-w-6xl mx-auto py-16 px-4">
+    <h1 class="text-4xl font-bold text-white mb-4">Route Statistics</h1>
+    <p class="text-gray-400 mb-12">Performance metrics from the OpenQuest route optimizer.</p>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      <StatsCard label="Distance Savings" value={`${distanceSavings}%`} sublabel="vs naive ordering" />
+      <StatsCard label="Total Quests" value={totalQuests} />
+      <StatsCard label="Total Steps" value={totalSteps.toLocaleString()} />
+      <StatsCard label="Extras" value={totalExtras} sublabel={`${glyphs} glyphs, ${treasures} treasures, ${rares} rares`} />
+    </div>
+
+    <!-- Quest Breakdown -->
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+      <div class="bg-midnight-700 border border-midnight-600 rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">Quest Types</h2>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Campaign</span>
+            <span class="text-gold-400 font-semibold">{campaignQuests}</span>
+          </div>
+          <div class="w-full bg-midnight-600 rounded-full h-2">
+            <div class="bg-gold-400 h-2 rounded-full" style={`width: ${(campaignQuests / totalQuests * 100).toFixed(0)}%`}></div>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Side Stories</span>
+            <span class="text-arcane-400 font-semibold">{sideStoryQuests}</span>
+          </div>
+          <div class="w-full bg-midnight-600 rounded-full h-2">
+            <div class="bg-arcane-400 h-2 rounded-full" style={`width: ${(sideStoryQuests / totalQuests * 100).toFixed(0)}%`}></div>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300">Other</span>
+            <span class="text-gray-400 font-semibold">{totalQuests - campaignQuests - sideStoryQuests}</span>
+          </div>
+          <div class="w-full bg-midnight-600 rounded-full h-2">
+            <div class="bg-gray-500 h-2 rounded-full" style={`width: ${((totalQuests - campaignQuests - sideStoryQuests) / totalQuests * 100).toFixed(0)}%`}></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-midnight-700 border border-midnight-600 rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-white mb-4">Zones</h2>
+        <div class="space-y-3">
+          {(guideStats.zones ?? []).map((zoneName: string) => (
+            <a
+              href={`/map/${zoneNameToKey[zoneName] ?? zoneName.toLowerCase()}`}
+              class="flex justify-between items-center hover:text-arcane-400 transition-colors"
+            >
+              <span class="text-gray-300">{zoneName}</span>
+              <span class="text-gray-400">&#x2192;</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quest Lines -->
+    <div class="bg-midnight-700 border border-midnight-600 rounded-lg p-6">
+      <h2 class="text-xl font-semibold text-white mb-4">Quest Lines ({questLines.length})</h2>
+      <div class="flex flex-wrap gap-2">
+        {questLines.map((ql: string) => (
+          <span class="bg-midnight-600 text-gray-300 text-sm px-3 py-1 rounded-full">{ql}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+</Layout>

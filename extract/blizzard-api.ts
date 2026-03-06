@@ -19,8 +19,9 @@ const API_BASE = 'https://us.api.blizzard.com';
 const NAMESPACE = 'static-us'; // will be overridden with specific build if needed
 const LOCALE = 'en_US';
 
-// Rate limiting: 100 req/sec max, we'll stay well under
-const RATE_LIMIT_DELAY = 15; // ms between requests
+// Rate limiting: 36,000 req/hr = 10/sec max. Blizzard may return 401
+// instead of 429 when rate-limited, invalidating the token.
+const RATE_LIMIT_DELAY = 120; // ms between requests (~8/sec, well under limit)
 const BATCH_SIZE = 50;
 
 interface TokenResponse {
@@ -57,7 +58,7 @@ async function getAccessToken(): Promise<string> {
   return accessToken;
 }
 
-async function fetchQuest(questId: number): Promise<BlizzardQuestResponse | null> {
+async function fetchQuest(questId: number, retries = 2): Promise<BlizzardQuestResponse | null> {
   const token = await getAccessToken();
   const url = `${API_BASE}/data/wow/quest/${questId}?namespace=${NAMESPACE}&locale=${LOCALE}`;
 
@@ -66,6 +67,15 @@ async function fetchQuest(questId: number): Promise<BlizzardQuestResponse | null
   });
 
   if (resp.status === 404) return null;
+
+  // 401/429 may indicate rate limiting — back off and retry with fresh token
+  if ((resp.status === 401 || resp.status === 429) && retries > 0) {
+    console.warn(`  Rate limit suspected (${resp.status}) for quest ${questId}, backing off...`);
+    accessToken = null; // force re-auth on next attempt
+    await sleep(5000 * (3 - retries)); // 5s, then 10s
+    return fetchQuest(questId, retries - 1);
+  }
+
   if (!resp.ok) {
     console.warn(`  API error for quest ${questId}: ${resp.status}`);
     return null;

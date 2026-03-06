@@ -4,5 +4,8 @@ dist/
 data/raw/
 data/enriched/
 data/midnight/
+data/handynotes/
 .env
 *.log
+website/node_modules/
+website/dist/

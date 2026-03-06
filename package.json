@@ -9,14 +9,20 @@
     "extract:merge": "tsx extract/merge.ts",
     "extract": "tsx extract/casc-extract.ts && tsx extract/blizzard-api.ts && tsx extract/merge.ts",
     "route": "tsx router/index.ts",
-    "build": "npm run extract && npm run route"
+    "addon:build": "npm run route -- full && mkdir -p ../workspace-quest-guide/addon/OpenQuest/Data && cp data/midnight/guide-full.lua ../workspace-quest-guide/addon/OpenQuest/Data/GuideData.lua",
+    "build": "npm run extract && npm run route",
+    "website:dev": "cd website && npm run dev",
+    "website:build": "cd website && npm run build",
+    "website:sync": "cp data/midnight/{guide-full,quests,extras,stats,guide-full-stats}.json website/public/data/",
+    "extract:maps": "tsx scripts/extract-maps.ts"
   },
   "dependencies": {
-    "@rhyster/wow-casc-dbc": "^2.12.2"
+    "@rhyster/wow-casc-dbc": "^2.12.2",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
-    "tsx": "^4.19.0",
     "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.7.0"
   }
 }

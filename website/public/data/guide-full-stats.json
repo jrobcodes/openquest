@@ -1,0 +1,27 @@
+{
+  "totalSteps": 3984,
+  "accepts": 687,
+  "objectives": 2456,
+  "turnins": 687,
+  "collects": 154,
+  "travels": 0,
+  "uniqueQuests": 687,
+  "extras": {
+    "glyphs": 42,
+    "treasures": 46,
+    "rares": 66
+  },
+  "zones": [
+    "Voidstorm",
+    "Eversong Woods",
+    "Zul'Aman",
+    "Harandar"
+  ],
+  "naiveDistance": 4336576.832973445,
+  "chainDistance": 4233098.644059288,
+  "optimizedDistance": 3261673.9641957944,
+  "vsNaivePct": 24.8,
+  "vsChainPct": 22.9,
+  "mode": "full",
+  "generatedAt": "2026-03-05T17:39:35.010Z"
+}

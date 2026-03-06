@@ -14,6 +14,10 @@ interface RouteNode {
   location: Coord;
   description: string;
   extraType?: 'glyph' | 'treasure' | 'rare';
+  npcName?: string;
+  trackingQuestId?: number;
+  level?: number;
+  isCampaign?: boolean;
 }
 
 /** Get the best known location for a quest (accept > first objective > null). */
@@ -96,16 +100,23 @@ export function solveZoneRoute(
   function processQuest(quest: Quest): void {
     const loc = questLocation(quest);
 
+    // Resolve accept/turnin with fallback to first objective location
+    const acceptLoc = quest.acceptLocation || quest.objectiveLocations[0] || loc;
+    const turnInLoc = quest.turnInLocation || quest.objectiveLocations[0] || loc;
+
     // Accept
-    if (loc) {
+    if (acceptLoc) {
       route.push({
         type: 'accept',
         questId: quest.id,
         questTitle: quest.title,
-        location: quest.acceptLocation || loc,
+        location: acceptLoc,
         description: `Accept: ${quest.title}`,
+        npcName: quest.acceptNpcName,
+        level: quest.level,
+        isCampaign: quest.flags.isCampaign || undefined,
       });
-      currentPos = quest.acceptLocation || loc;
+      currentPos = acceptLoc;
     }
 
     // Objectives (nearest-neighbor order)
@@ -127,30 +138,25 @@ export function solveZoneRoute(
         questTitle: quest.title,
         location: objLoc,
         description: `Complete objective: ${quest.title}`,
+        level: quest.level,
+        isCampaign: quest.flags.isCampaign || undefined,
       });
       currentPos = objLoc;
     }
 
     // Turn-in
-    if (quest.turnInLocation) {
+    if (turnInLoc) {
       route.push({
         type: 'turnin',
         questId: quest.id,
         questTitle: quest.title,
-        location: quest.turnInLocation,
+        location: turnInLoc,
         description: `Turn in: ${quest.title}`,
+        npcName: quest.turnInNpcName,
+        level: quest.level,
+        isCampaign: quest.flags.isCampaign || undefined,
       });
-      currentPos = quest.turnInLocation;
-    } else if (loc) {
-      // No separate turn-in — auto-completes or turn in at accept NPC
-      route.push({
-        type: 'turnin',
-        questId: quest.id,
-        questTitle: quest.title,
-        location: loc,
-        description: `Turn in: ${quest.title}`,
-      });
-      currentPos = loc;
+      currentPos = turnInLoc;
     }
 
     completeQuest(quest.id);
@@ -192,7 +198,7 @@ export function solveZoneRoute(
 
       // Accept all
       for (const bq of batchQuests) {
-        const loc = bq.acceptLocation || questLocation(bq);
+        const loc = bq.acceptLocation || bq.objectiveLocations[0] || questLocation(bq);
         if (loc) {
           route.push({
             type: 'accept',
@@ -200,6 +206,9 @@ export function solveZoneRoute(
             questTitle: bq.title,
             location: loc,
             description: `Accept: ${bq.title}`,
+            npcName: bq.acceptNpcName,
+            level: bq.level,
+            isCampaign: bq.flags.isCampaign || undefined,
           });
           currentPos = loc;
         }
@@ -231,14 +240,16 @@ export function solveZoneRoute(
           questTitle: objQuest.title,
           location: loc,
           description: `Complete objective: ${objQuest.title}`,
+          level: objQuest.level,
+          isCampaign: objQuest.flags.isCampaign || undefined,
         });
         currentPos = loc;
       }
 
       // Turn in all (nearest-neighbor order)
       const turnins = batchQuests
-        .filter(bq => bq.turnInLocation || questLocation(bq))
-        .map(bq => ({ quest: bq, loc: (bq.turnInLocation || questLocation(bq))! }));
+        .filter(bq => bq.turnInLocation || bq.objectiveLocations[0] || questLocation(bq))
+        .map(bq => ({ quest: bq, loc: (bq.turnInLocation || bq.objectiveLocations[0] || questLocation(bq))! }));
 
       while (turnins.length > 0) {
         let nearestIdx = 0;
@@ -257,6 +268,9 @@ export function solveZoneRoute(
           questTitle: tiQuest.title,
           location: tiLoc,
           description: `Turn in: ${tiQuest.title}`,
+          npcName: tiQuest.turnInNpcName,
+          level: tiQuest.level,
+          isCampaign: tiQuest.flags.isCampaign || undefined,
         });
         currentPos = tiLoc;
       }
@@ -304,6 +318,7 @@ function insertExtras(route: RouteNode[], extras: Extra[]): void {
       location: extraLoc,
       description: `Collect ${extra.type}: ${extra.name}`,
       extraType: extra.type,
+      trackingQuestId: extra.trackingQuestId,
     });
   }
 }
@@ -327,5 +342,9 @@ export function routeToSteps(
     mapId: node.location.mapId || mapId,
     zone,
     extraType: node.extraType,
+    npcName: node.npcName,
+    trackingQuestId: node.trackingQuestId,
+    level: node.level,
+    isCampaign: node.isCampaign,
   }));
 }

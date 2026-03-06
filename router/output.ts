@@ -61,8 +61,29 @@ export function toLua(steps: GuideStep[], varName: string = 'OpenQuestGuide'): s
     fields.push(`mapId = ${step.mapId}`);
     fields.push(`zone = "${luaEscape(step.zone)}"`);
 
+    if (step.mapX !== undefined && step.mapY !== undefined) {
+      fields.push(`mapX = ${step.mapX.toFixed(4)}`);
+      fields.push(`mapY = ${step.mapY.toFixed(4)}`);
+    }
+
     if (step.extraType) {
       fields.push(`extraType = "${step.extraType}"`);
+    }
+
+    if (step.trackingQuestId !== undefined) {
+      fields.push(`trackingQuestId = ${step.trackingQuestId}`);
+    }
+
+    if (step.npcName) {
+      fields.push(`npcName = "${luaEscape(step.npcName)}"`);
+    }
+
+    if (step.level) {
+      fields.push(`level = ${step.level}`);
+    }
+
+    if (step.isCampaign) {
+      fields.push(`isCampaign = true`);
     }
 
     lines.push(`  { ${fields.join(', ')} },`);

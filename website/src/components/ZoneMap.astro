@@ -1,0 +1,202 @@
+---
+interface Props {
+  zoneKey: string;
+  zoneName: string;
+}
+
+const { zoneKey, zoneName } = Astro.props;
+---
+
+<div id="zone-map-app" data-zone-key={zoneKey} data-zone-name={zoneName}>
+  <div class="flex flex-col lg:flex-row gap-4 h-[calc(100vh-12rem)]">
+    <!-- Map -->
+    <div class="flex-1 relative">
+      <div id="map" class="w-full h-full rounded-lg border border-midnight-600 bg-midnight-700"></div>
+      <!-- Filters -->
+      <div class="absolute top-3 right-3 z-[1000] bg-midnight-800/90 border border-midnight-600 rounded-lg p-3 space-y-2 text-sm">
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+          <input type="checkbox" id="filter-campaign" checked class="accent-gold-400" />
+          Campaign
+        </label>
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+          <input type="checkbox" id="filter-side" checked class="accent-arcane-400" />
+          Side Quests
+        </label>
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+          <input type="checkbox" id="filter-extras" checked class="accent-purple-400" />
+          Extras
+        </label>
+        <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+          <input type="checkbox" id="filter-route" checked class="accent-gray-400" />
+          Route Lines
+        </label>
+      </div>
+    </div>
+
+    <!-- Step list sidebar -->
+    <div class="lg:w-80 h-64 lg:h-full overflow-y-auto bg-midnight-700 border border-midnight-600 rounded-lg">
+      <div class="sticky top-0 bg-midnight-700 p-3 border-b border-midnight-600">
+        <h3 class="text-white font-semibold text-sm">Route Steps</h3>
+        <p id="step-count" class="text-gray-500 text-xs"></p>
+      </div>
+      <div id="step-list" class="p-2 space-y-0.5"></div>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  declare const L: typeof import('leaflet');
+
+  interface GuideStep {
+    stepNumber: number;
+    action: string;
+    questId?: number;
+    questTitle?: string;
+    description: string;
+    zone: string;
+    mapX?: number;
+    mapY?: number;
+    extraType?: string;
+    npcName?: string;
+    isCampaign?: boolean;
+  }
+
+  const app = document.getElementById('zone-map-app')!;
+  const zoneName = app.dataset.zoneName!;
+
+  const actionColors: Record<string, string> = {
+    accept: '#22c55e',
+    turnin: '#3b82f6',
+    objective: '#eab308',
+    collect: '#a855f7',
+    travel: '#6b7280',
+  };
+
+  const actionIcons: Record<string, string> = {
+    accept: '!',
+    turnin: '?',
+    objective: '*',
+    collect: '+',
+    travel: '>',
+  };
+
+  // Initialize Leaflet with simple CRS (pixel coordinates)
+  const map = L.map('map', {
+    crs: L.CRS.Simple,
+    minZoom: 0,
+    maxZoom: 4,
+    zoomSnap: 0.5,
+  });
+
+  // Set bounds: mapX/mapY are normalized 0-1
+  const bounds: L.LatLngBoundsExpression = [[0, 0], [1, 1]];
+  map.fitBounds(bounds);
+
+  // Try to load zone map image as overlay
+  const zoneKey = app.dataset.zoneKey!;
+  const imageUrl = `/maps/${zoneKey}.png`;
+  L.imageOverlay(imageUrl, bounds).addTo(map);
+
+  let allSteps: GuideStep[] = [];
+  let markers: L.CircleMarker[] = [];
+  let routeLine: L.Polyline | null = null;
+
+  async function loadData() {
+    const res = await fetch('/data/guide-full.json');
+    const guide: GuideStep[] = await res.json();
+    allSteps = guide.filter(s => s.zone === zoneName && s.mapX != null && s.mapY != null);
+    render();
+  }
+
+  function shouldShow(step: GuideStep): boolean {
+    const showCampaign = (document.getElementById('filter-campaign') as HTMLInputElement).checked;
+    const showSide = (document.getElementById('filter-side') as HTMLInputElement).checked;
+    const showExtras = (document.getElementById('filter-extras') as HTMLInputElement).checked;
+
+    if (step.extraType) return showExtras;
+    if (step.isCampaign) return showCampaign;
+    return showSide;
+  }
+
+  function render() {
+    // Clear existing
+    markers.forEach(m => m.remove());
+    markers = [];
+    routeLine?.remove();
+
+    const filtered = allSteps.filter(shouldShow);
+    const showRoute = (document.getElementById('filter-route') as HTMLInputElement).checked;
+
+    // Route line
+    if (showRoute && filtered.length > 1) {
+      const points: L.LatLngExpression[] = filtered.map(s => [1 - s.mapY!, s.mapX!]);
+      routeLine = L.polyline(points, {
+        color: '#6b7280',
+        weight: 1.5,
+        opacity: 0.4,
+        dashArray: '4 4',
+      }).addTo(map);
+    }
+
+    // Markers
+    filtered.forEach(step => {
+      const color = actionColors[step.action] ?? '#6b7280';
+      const marker = L.circleMarker([1 - step.mapY!, step.mapX!], {
+        radius: 5,
+        fillColor: color,
+        color: '#000',
+        weight: 1,
+        fillOpacity: 0.9,
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <div style="color:#000;min-width:150px">
+          <strong>${step.description}</strong><br/>
+          <span style="color:#666">Step ${step.stepNumber}</span>
+          ${step.npcName ? `<br/><span style="color:#666">NPC: ${step.npcName}</span>` : ''}
+          ${step.questTitle ? `<br/><span style="color:#666">${step.questTitle}</span>` : ''}
+        </div>
+      `);
+
+      markers.push(marker);
+    });
+
+    // Step list
+    const stepList = document.getElementById('step-list')!;
+    const stepCount = document.getElementById('step-count')!;
+    stepCount.textContent = `${filtered.length} steps`;
+
+    stepList.innerHTML = filtered.map((step, i) => {
+      const color = actionColors[step.action] ?? '#6b7280';
+      const icon = actionIcons[step.action] ?? '?';
+      return `
+        <button class="step-item w-full text-left px-2 py-1.5 rounded text-xs hover:bg-midnight-600 transition-colors flex items-center gap-2" data-index="${i}">
+          <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style="background:${color};color:#000">${icon}</span>
+          <span class="text-gray-300 truncate">${step.description}</span>
+        </button>
+      `;
+    }).join('');
+
+    // Click step -> pan to marker
+    stepList.querySelectorAll('.step-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.getAttribute('data-index'));
+        const step = filtered[idx];
+        if (step && markers[idx]) {
+          map.setView([1 - step.mapY!, step.mapX!], 3);
+          markers[idx].openPopup();
+        }
+      });
+    });
+  }
+
+  // Filter change handlers
+  ['filter-campaign', 'filter-side', 'filter-extras', 'filter-route'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', render);
+  });
+
+  loadData();
+</script>

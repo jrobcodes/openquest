@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-midnight-900: #0c0a1d;
+  --color-midnight-800: #151230;
+  --color-midnight-700: #1e1a44;
+  --color-midnight-600: #2a2557;
+  --color-midnight-500: #38326e;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-arcane-400: #a78bfa;
+  --color-arcane-500: #8b5cf6;
+}

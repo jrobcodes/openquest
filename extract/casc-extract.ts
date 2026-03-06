@@ -17,10 +17,18 @@ const TABLES = [
   'questpoiblob',
   'questpoipoint',
   'achievement',
+  'achievementcategory',
+  'criteria',
+  'criteriatree',
   'vignette',
   'areapoi',
   'questv2',
   'questinfo',
+  'gameobjects',         // treasure/glyph world positions
+  'gameobjectdisplayinfo',
+  'uimapassignment',     // world coord → UI map coord transform
+  'creature',
+  'questoffer',
 ] as const;
 
 type ColumnData = number | bigint | string | undefined | (number | bigint | string | undefined)[];

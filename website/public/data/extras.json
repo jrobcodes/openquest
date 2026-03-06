@@ -1,0 +1,1962 @@
+[
+  {
+    "id": 7131,
+    "type": "rare",
+    "name": "Anti-Gravity Area",
+    "location": {
+      "x": 3803,
+      "y": -997,
+      "z": -145,
+      "mapId": 2405
+    },
+    "trackingQuestId": 91419,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 91280,
+    "type": "rare",
+    "name": "Warden of Weeds",
+    "location": {
+      "x": 5532,
+      "y": -4744,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 91280,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 91315,
+    "type": "rare",
+    "name": "Harried Hawkstrider",
+    "location": {
+      "x": 5253,
+      "y": -4098,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 91315,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92392,
+    "type": "rare",
+    "name": "Dormant Lightbloom Hydra",
+    "location": {
+      "x": 6387,
+      "y": -5006,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92392,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92366,
+    "type": "rare",
+    "name": "Bloated Snapdragon",
+    "location": {
+      "x": 6142,
+      "y": -3298,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92366,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92391,
+    "type": "rare",
+    "name": "Cre'van, Cruel Taskmaster",
+    "location": {
+      "x": 7084,
+      "y": -5763,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92391,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92389,
+    "type": "rare",
+    "name": "Coralfang",
+    "location": {
+      "x": 7882,
+      "y": -3281,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92389,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92393,
+    "type": "rare",
+    "name": "Lady Liminus",
+    "location": {
+      "x": 5320,
+      "y": -3307,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92393,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92409,
+    "type": "rare",
+    "name": "Terrinor",
+    "location": {
+      "x": 4805,
+      "y": -3640,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92409,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92404,
+    "type": "rare",
+    "name": "Bad Zed",
+    "location": {
+      "x": 4656,
+      "y": -4474,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92404,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92395,
+    "type": "rare",
+    "name": "Waverly",
+    "location": {
+      "x": 8848,
+      "y": -3133,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92395,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92403,
+    "type": "rare",
+    "name": "Banuran",
+    "location": {
+      "x": 5294,
+      "y": -5168,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92403,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 92399,
+    "type": "rare",
+    "name": "Lost Guardian",
+    "location": {
+      "x": 5193,
+      "y": -5430,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 92399,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93550,
+    "type": "rare",
+    "name": "Duskburn",
+    "location": {
+      "x": 5839,
+      "y": -3840,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93550,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93555,
+    "type": "rare",
+    "name": "Malfunctioning Construct",
+    "location": {
+      "x": 7278,
+      "y": -4722,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93555,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93561,
+    "type": "rare",
+    "name": "Dame Bloodshed",
+    "location": {
+      "x": 7745,
+      "y": -4092,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93561,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 95011,
+    "type": "rare",
+    "name": "Tarhu the Ransacker",
+    "location": {
+      "x": 11345,
+      "y": -4716,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 95011,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 95010,
+    "type": "rare",
+    "name": "Dripping Shadow",
+    "location": {
+      "x": 11150,
+      "y": -4120,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 95010,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93967,
+    "type": "treasure",
+    "name": "Rookery Cache",
+    "location": {
+      "x": 8477,
+      "y": -4018,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93967,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93456,
+    "type": "treasure",
+    "name": "Triple-Locked Safebox",
+    "location": {
+      "x": 5390,
+      "y": -3518,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93456,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93544,
+    "type": "treasure",
+    "name": "Gift of the Phoenix",
+    "location": {
+      "x": 8944,
+      "y": -3712,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93544,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 94747,
+    "type": "treasure",
+    "name": "Eversong Woods treasure 20",
+    "location": {
+      "x": 5803,
+      "y": -3930,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 94747,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93908,
+    "type": "treasure",
+    "name": "Gilded Armillary Sphere",
+    "location": {
+      "x": 7306,
+      "y": -4056,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93908,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93455,
+    "type": "treasure",
+    "name": "Antique Nobleman's Signet Ring",
+    "location": {
+      "x": 7313,
+      "y": -4784,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93455,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 93457,
+    "type": "treasure",
+    "name": "Farstrider's Lost Quiver",
+    "location": {
+      "x": 5941,
+      "y": -5569,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 93457,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 86645,
+    "type": "treasure",
+    "name": "Eversong Woods treasure 24",
+    "location": {
+      "x": 6342,
+      "y": -3663,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 86645,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 91358,
+    "type": "treasure",
+    "name": "Burbling Paint Pot",
+    "location": {
+      "x": 5429,
+      "y": -4444,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 91358,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 94781,
+    "type": "treasure",
+    "name": "Incomplete Book of Sonnets",
+    "location": {
+      "x": 8793,
+      "y": -4396,
+      "z": 0,
+      "mapId": 2395
+    },
+    "trackingQuestId": 94781,
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 27",
+    "location": {
+      "x": 9648,
+      "y": -4691,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 28",
+    "location": {
+      "x": 8120,
+      "y": -5995,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 29",
+    "location": {
+      "x": 8938,
+      "y": -5403,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 30",
+    "location": {
+      "x": 6423,
+      "y": -3622,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 31",
+    "location": {
+      "x": 7150,
+      "y": -4514,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 32",
+    "location": {
+      "x": 7300,
+      "y": -3570,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 33",
+    "location": {
+      "x": 6224,
+      "y": -5751,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 34",
+    "location": {
+      "x": 5925,
+      "y": -4795,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 35",
+    "location": {
+      "x": 6059,
+      "y": -3004,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 36",
+    "location": {
+      "x": 6504,
+      "y": -5357,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 61576,
+    "type": "glyph",
+    "name": "Eversong Woods glyph 37",
+    "location": {
+      "x": 7255,
+      "y": -3923,
+      "z": 0,
+      "mapId": 2395
+    },
+    "zone": "Eversong Woods"
+  },
+  {
+    "id": 89569,
+    "type": "rare",
+    "name": "Necrohexxer Raz'ka",
+    "location": {
+      "x": 6328,
+      "y": -6721,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89569,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89570,
+    "type": "rare",
+    "name": "The Snapping Scourge",
+    "location": {
+      "x": 7189,
+      "y": -8278,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89570,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89571,
+    "type": "rare",
+    "name": "Skullcrusher Harak",
+    "location": {
+      "x": 3950,
+      "y": -8282,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89571,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89575,
+    "type": "rare",
+    "name": "Lightwood Borer",
+    "location": {
+      "x": 6842,
+      "y": -6233,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89575,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 91174,
+    "type": "rare",
+    "name": "Mrrlokk",
+    "location": {
+      "x": 4413,
+      "y": -8195,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 91174,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 91634,
+    "type": "rare",
+    "name": "Poacher Rav'ik",
+    "location": {
+      "x": 5318,
+      "y": -7131,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 91634,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89578,
+    "type": "rare",
+    "name": "Spinefrill",
+    "location": {
+      "x": 5641,
+      "y": -6370,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89578,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89579,
+    "type": "rare",
+    "name": "Oophaga",
+    "location": {
+      "x": 5249,
+      "y": -7785,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89579,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89580,
+    "type": "rare",
+    "name": "Tiny Vermin",
+    "location": {
+      "x": 6258,
+      "y": -7917,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89580,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89581,
+    "type": "rare",
+    "name": "Voidtouched Crustacean",
+    "location": {
+      "x": 4091,
+      "y": -5548,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89581,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89583,
+    "type": "rare",
+    "name": "The Devouring Invader",
+    "location": {
+      "x": 7049,
+      "y": -7185,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89583,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89572,
+    "type": "rare",
+    "name": "Elder Oaktalon",
+    "location": {
+      "x": 2991,
+      "y": -6659,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89572,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 89573,
+    "type": "rare",
+    "name": "Depthborn Eelamental",
+    "location": {
+      "x": 7073,
+      "y": -7909,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 89573,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 91072,
+    "type": "rare",
+    "name": "The Decaying Diamondback",
+    "location": {
+      "x": 5711,
+      "y": -7794,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 91072,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 91073,
+    "type": "rare",
+    "name": "Ash'an the Empowered",
+    "location": {
+      "x": 5812,
+      "y": -7695,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 91073,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90794,
+    "type": "treasure",
+    "name": "Abandoned Ritual Skull",
+    "location": {
+      "x": 5669,
+      "y": -7644,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90794,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90793,
+    "type": "treasure",
+    "name": "Honored Warrior's Cache",
+    "location": {
+      "x": 3416,
+      "y": -7833,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90793,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 93871,
+    "type": "treasure",
+    "name": "Sealed Twilight's Blade Bounty",
+    "location": {
+      "x": 3683,
+      "y": -5601,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 93871,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90795,
+    "type": "treasure",
+    "name": "Bait and Tackle",
+    "location": {
+      "x": 4330,
+      "y": -5507,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90795,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90796,
+    "type": "treasure",
+    "name": "Burrow Bounty",
+    "location": {
+      "x": 5449,
+      "y": -7400,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90796,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90797,
+    "type": "treasure",
+    "name": "Mrruk's Mangy Trove",
+    "location": {
+      "x": 4363,
+      "y": -8324,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90797,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90798,
+    "type": "treasure",
+    "name": "Secret Formula",
+    "location": {
+      "x": 6155,
+      "y": -7265,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90798,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90799,
+    "type": "treasure",
+    "name": "Abandoned Nest",
+    "location": {
+      "x": 5172,
+      "y": -7458,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90799,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 90790,
+    "type": "treasure",
+    "name": "Ruz'avalt's Prized Tackle",
+    "location": {
+      "x": 4947,
+      "y": -7608,
+      "z": 0,
+      "mapId": 2437
+    },
+    "trackingQuestId": 90790,
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 62",
+    "location": {
+      "x": 4085,
+      "y": -5357,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 63",
+    "location": {
+      "x": 6250,
+      "y": -7483,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 64",
+    "location": {
+      "x": 3503,
+      "y": -8442,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 65",
+    "location": {
+      "x": 6894,
+      "y": -8249,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 66",
+    "location": {
+      "x": 5049,
+      "y": -8403,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 67",
+    "location": {
+      "x": 7120,
+      "y": -7181,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 68",
+    "location": {
+      "x": 3241,
+      "y": -6363,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 69",
+    "location": {
+      "x": 6594,
+      "y": -6140,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 70",
+    "location": {
+      "x": 5028,
+      "y": -5863,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 71",
+    "location": {
+      "x": 3397,
+      "y": -7820,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 61581,
+    "type": "glyph",
+    "name": "Zul'Aman glyph 72",
+    "location": {
+      "x": 3518,
+      "y": -7467,
+      "z": 0,
+      "mapId": 2437
+    },
+    "zone": "Zul'Aman"
+  },
+  {
+    "id": 91832,
+    "type": "rare",
+    "name": "Rhazul",
+    "location": {
+      "x": 238,
+      "y": -295,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 91832,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92137,
+    "type": "rare",
+    "name": "Chironex",
+    "location": {
+      "x": 473,
+      "y": -1624,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92137,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92142,
+    "type": "rare",
+    "name": "Ha'kalawe",
+    "location": {
+      "x": -495,
+      "y": -1659,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92142,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92148,
+    "type": "rare",
+    "name": "Tallcap the Truthspreader",
+    "location": {
+      "x": -970,
+      "y": -1921,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92148,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92154,
+    "type": "rare",
+    "name": "Queen Lashtongue",
+    "location": {
+      "x": 163,
+      "y": -959,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92154,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92161,
+    "type": "rare",
+    "name": "Chlorokyll",
+    "location": {
+      "x": 107,
+      "y": -1311,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92161,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92168,
+    "type": "rare",
+    "name": "Stumpy",
+    "location": {
+      "x": 877,
+      "y": -1385,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92168,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92170,
+    "type": "rare",
+    "name": "Serrasa",
+    "location": {
+      "x": 862,
+      "y": -690,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92170,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92172,
+    "type": "rare",
+    "name": "Mindrot",
+    "location": {
+      "x": 945,
+      "y": 101,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92172,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92176,
+    "type": "rare",
+    "name": "Dracaena",
+    "location": {
+      "x": 357,
+      "y": 501,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92176,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92183,
+    "type": "rare",
+    "name": "Treetop",
+    "location": {
+      "x": -1267,
+      "y": 808,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92183,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92190,
+    "type": "rare",
+    "name": "Oro'ohna",
+    "location": {
+      "x": -1603,
+      "y": 1450,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92190,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92191,
+    "type": "rare",
+    "name": "Pterrock",
+    "location": {
+      "x": -1023,
+      "y": 1514,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92191,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92193,
+    "type": "rare",
+    "name": "Ahl'ua'huhi",
+    "location": {
+      "x": -537,
+      "y": 573,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92193,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92194,
+    "type": "rare",
+    "name": "Annulus the Worldshaker",
+    "location": {
+      "x": 1690,
+      "y": 232,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92194,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92424,
+    "type": "treasure",
+    "name": "Failed Shroom Jumper's Satchel",
+    "location": {
+      "x": 962,
+      "y": -1849,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92424,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92426,
+    "type": "treasure",
+    "name": "Burning Branch of the World Tree",
+    "location": {
+      "x": -9,
+      "y": 15,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92426,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92427,
+    "type": "treasure",
+    "name": "Sporelord's Fight Prize",
+    "location": {
+      "x": -772,
+      "y": -1998,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92427,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92431,
+    "type": "treasure",
+    "name": "Reliquary's Lost Paintbrush",
+    "location": {
+      "x": -59,
+      "y": -1184,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92431,
+    "zone": "Harandar"
+  },
+  {
+    "id": 92436,
+    "type": "treasure",
+    "name": "Kemet's Simmering Cauldron",
+    "location": {
+      "x": 537,
+      "y": -638,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 92436,
+    "zone": "Harandar"
+  },
+  {
+    "id": 93130,
+    "type": "treasure",
+    "name": "A Tattered Ball",
+    "location": {
+      "x": 127,
+      "y": -294,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 93130,
+    "zone": "Harandar"
+  },
+  {
+    "id": 93145,
+    "type": "treasure",
+    "name": "Lost Hunting Knife",
+    "location": {
+      "x": -155,
+      "y": 6,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 93145,
+    "zone": "Harandar"
+  },
+  {
+    "id": 93146,
+    "type": "treasure",
+    "name": "A Rolled-Up Pillow",
+    "location": {
+      "x": -429,
+      "y": -294,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 93146,
+    "zone": "Harandar"
+  },
+  {
+    "id": 93144,
+    "type": "treasure",
+    "name": "Gift of the Cycle",
+    "location": {
+      "x": -145,
+      "y": -299,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 93144,
+    "zone": "Harandar"
+  },
+  {
+    "id": 93508,
+    "type": "treasure",
+    "name": "Sealed Gourd",
+    "location": {
+      "x": -885,
+      "y": 1555,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 93508,
+    "zone": "Harandar"
+  },
+  {
+    "id": 93650,
+    "type": "treasure",
+    "name": "Sporespawned Cache",
+    "location": {
+      "x": -894,
+      "y": 46,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 93650,
+    "zone": "Harandar"
+  },
+  {
+    "id": 93587,
+    "type": "treasure",
+    "name": "Peculiar Cauldron",
+    "location": {
+      "x": 1113,
+      "y": 502,
+      "z": 0,
+      "mapId": 2413
+    },
+    "trackingQuestId": 93587,
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 100",
+    "location": {
+      "x": 288,
+      "y": -983,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 101",
+    "location": {
+      "x": -159,
+      "y": 15,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 102",
+    "location": {
+      "x": 1336,
+      "y": 967,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 103",
+    "location": {
+      "x": 209,
+      "y": -1669,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 104",
+    "location": {
+      "x": 731,
+      "y": -519,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 105",
+    "location": {
+      "x": 1215,
+      "y": -1950,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 106",
+    "location": {
+      "x": -643,
+      "y": 206,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 107",
+    "location": {
+      "x": -572,
+      "y": 1570,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 61582,
+    "type": "glyph",
+    "name": "Harandar glyph 108",
+    "location": {
+      "x": -880,
+      "y": -1105,
+      "z": 0,
+      "mapId": 2413
+    },
+    "zone": "Harandar"
+  },
+  {
+    "id": 90805,
+    "type": "rare",
+    "name": "Sundereth the Caller",
+    "location": {
+      "x": 2260,
+      "y": 1802,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 90805,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 91050,
+    "type": "rare",
+    "name": "Terrirotrial Voidscythe",
+    "location": {
+      "x": 97,
+      "y": 1340,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 91050,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 91048,
+    "type": "rare",
+    "name": "Tremora",
+    "location": {
+      "x": -9,
+      "y": 1126,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 91048,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93966,
+    "type": "rare",
+    "name": "Screammaxa the Matriarch",
+    "location": {
+      "x": 2161,
+      "y": 363,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93966,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93946,
+    "type": "rare",
+    "name": "Bane of the Vilebloods",
+    "location": {
+      "x": 189,
+      "y": 18,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93946,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93944,
+    "type": "rare",
+    "name": "Aeonelle Blackstar",
+    "location": {
+      "x": 1322,
+      "y": 813,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93944,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93884,
+    "type": "rare",
+    "name": "Bilemaw the Gluttonous",
+    "location": {
+      "x": 2250,
+      "y": 1194,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93884,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 91047,
+    "type": "rare",
+    "name": "Eruundi",
+    "location": {
+      "x": 2699,
+      "y": 130,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 91047,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93896,
+    "type": "rare",
+    "name": "Far'thana the Mad",
+    "location": {
+      "x": 1403,
+      "y": -683,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93896,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93947,
+    "type": "rare",
+    "name": "Lotus Darkblossom",
+    "location": {
+      "x": 789,
+      "y": 950,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93947,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 91051,
+    "type": "rare",
+    "name": "Nightbrood",
+    "location": {
+      "x": 2856,
+      "y": 718,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 91051,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93934,
+    "type": "rare",
+    "name": "Queen o' War",
+    "location": {
+      "x": 269,
+      "y": -864,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93934,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93953,
+    "type": "rare",
+    "name": "Rakshur the Bonegrinder",
+    "location": {
+      "x": 4156,
+      "y": -118,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93953,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93895,
+    "type": "rare",
+    "name": "Ravengerus",
+    "location": {
+      "x": 2045,
+      "y": -161,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93895,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94459,
+    "type": "rare",
+    "name": "Voidseer Orivane",
+    "location": {
+      "x": 1145,
+      "y": 1719,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94459,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94459,
+    "type": "rare",
+    "name": "Voidseer Orivane",
+    "location": {
+      "x": 950,
+      "y": 1734,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94459,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94460,
+    "type": "rare",
+    "name": "Nullsprial",
+    "location": {
+      "x": 1054,
+      "y": 1774,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94460,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94458,
+    "type": "rare",
+    "name": "The Many-Broken",
+    "location": {
+      "x": 894,
+      "y": 1870,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94458,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93237,
+    "type": "treasure",
+    "name": "Final Clutch of Predaxas",
+    "location": {
+      "x": 275,
+      "y": -276,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93237,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 92414,
+    "type": "treasure",
+    "name": "Void-Shielded Tomb",
+    "location": {
+      "x": 1094,
+      "y": 2184,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 92414,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93431,
+    "type": "treasure",
+    "name": "Bloody Sack",
+    "location": {
+      "x": 538,
+      "y": -1760,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93431,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93840,
+    "type": "treasure",
+    "name": "Malignant Chest",
+    "location": {
+      "x": 2763,
+      "y": -624,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93840,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93996,
+    "type": "treasure",
+    "name": "Stellar Stash",
+    "location": {
+      "x": 4419,
+      "y": -428,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93996,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94454,
+    "type": "treasure",
+    "name": "Forgotten Researcher's Cache",
+    "location": {
+      "x": 239,
+      "y": 31,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94454,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94454,
+    "type": "treasure",
+    "name": "Forgotten Researcher's Cache",
+    "location": {
+      "x": 332,
+      "y": -72,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94454,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94387,
+    "type": "treasure",
+    "name": "Scout's Pack",
+    "location": {
+      "x": 4788,
+      "y": -242,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94387,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93553,
+    "type": "treasure",
+    "name": "Embedded Spear",
+    "location": {
+      "x": 542,
+      "y": -829,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93553,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93500,
+    "type": "treasure",
+    "name": "Quivering Egg",
+    "location": {
+      "x": 2638,
+      "y": 1600,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93500,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93569,
+    "type": "treasure",
+    "name": "Voidstorm treasure 137",
+    "location": {
+      "x": 713,
+      "y": 1922,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93569,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93496,
+    "type": "treasure",
+    "name": "Discarded Energy Pike",
+    "location": {
+      "x": 2848,
+      "y": 1165,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93496,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93493,
+    "type": "treasure",
+    "name": "Slain Scout's Quiver",
+    "location": {
+      "x": 100,
+      "y": 429,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93493,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 93467,
+    "type": "treasure",
+    "name": "Half-Digested Viscera",
+    "location": {
+      "x": 926,
+      "y": 970,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 93467,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 94742,
+    "type": "treasure",
+    "name": "Stormarion Cache",
+    "location": {
+      "x": 909,
+      "y": 2279,
+      "z": 0,
+      "mapId": 2405
+    },
+    "trackingQuestId": 94742,
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 142",
+    "location": {
+      "x": 1404,
+      "y": -420,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 143",
+    "location": {
+      "x": 2268,
+      "y": 1024,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 144",
+    "location": {
+      "x": 1514,
+      "y": 1175,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 145",
+    "location": {
+      "x": 843,
+      "y": 745,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 146",
+    "location": {
+      "x": 2568,
+      "y": -786,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 147",
+    "location": {
+      "x": 4034,
+      "y": 342,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 148",
+    "location": {
+      "x": 495,
+      "y": 846,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 149",
+    "location": {
+      "x": 2112,
+      "y": 196,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 150",
+    "location": {
+      "x": 778,
+      "y": -1816,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 151",
+    "location": {
+      "x": 3130,
+      "y": 1137,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  },
+  {
+    "id": 61583,
+    "type": "glyph",
+    "name": "Voidstorm glyph 152",
+    "location": {
+      "x": -275,
+      "y": -208,
+      "z": 0,
+      "mapId": 2405
+    },
+    "zone": "Voidstorm"
+  }
+]

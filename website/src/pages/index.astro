@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { zones } from '../lib/map-config';
+---
+
+<Layout title="Home">
+  <!-- Hero -->
+  <section class="py-20 px-4 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+        <span class="text-gold-400">OpenQuest</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-300 mb-4">
+        Free, algorithmically-optimized WoW questing guide
+      </p>
+      <p class="text-gray-400 mb-10 max-w-2xl mx-auto">
+        Route every quest in Midnight with 24.8% less travel distance than naive ordering.
+        Campaign, side stories, glyphs, treasures, and rares — all optimized.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/download"
+          class="bg-gold-400 hover:bg-gold-500 text-midnight-900 font-bold py-3 px-8 rounded-lg transition-colors text-lg"
+        >
+          Download Addon
+        </a>
+        <a
+          href="/map/voidstorm"
+          class="border border-arcane-400 text-arcane-400 hover:bg-arcane-400 hover:text-midnight-900 font-medium py-3 px-8 rounded-lg transition-colors text-lg"
+        >
+          View Maps
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="py-16 px-4 bg-midnight-800">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-white text-center mb-12">Why OpenQuest?</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="text-4xl mb-4">&#x1F9ED;</div>
+          <h3 class="text-xl font-semibold text-white mb-2">Optimized Routes</h3>
+          <p class="text-gray-400">
+            DAG-based dependency solver with nearest-neighbor heuristics minimizes backtracking across all 4 Midnight zones.
+          </p>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl mb-4">&#x2699;&#xFE0F;</div>
+          <h3 class="text-xl font-semibold text-white mb-2">Auto-Advance</h3>
+          <p class="text-gray-400">
+            In-game addon tracks quest progress and automatically advances to the next step. Just follow the arrow.
+          </p>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl mb-4">&#x1F48E;</div>
+          <h3 class="text-xl font-semibold text-white mb-2">Extras Included</h3>
+          <p class="text-gray-400">
+            Glyphs, treasures, and rare mobs inserted along your route via cheapest-insertion so you never go out of your way.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Zone Cards -->
+  <section class="py-16 px-4">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-white text-center mb-12">Explore Zones</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {zones.map(zone => (
+          <a
+            href={`/map/${zone.key}`}
+            class="group bg-midnight-700 border border-midnight-600 rounded-lg p-6 hover:border-arcane-400 transition-colors"
+          >
+            <h3 class="text-lg font-semibold text-white group-hover:text-arcane-400 transition-colors">
+              {zone.name}
+            </h3>
+            <p class="text-gray-400 text-sm mt-1">View interactive route map</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

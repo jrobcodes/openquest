@@ -6,7 +6,7 @@
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Quest, Extra, GuideStep, Coord } from '../shared/types.js';
+import type { Quest, Extra, GuideStep, Coord, UiMapRegion } from '../shared/types.js';
 import { buildDAG, validateDAG } from './dag.js';
 import { groupByZone, buildZoneConstraints, solveZoneOrder, euclidean } from './zones.js';
 import { solveZoneRoute, routeToSteps } from './solver.js';
@@ -14,14 +14,90 @@ import { improve, validateRoute } from './improve.js';
 import { toJSON, toLua, routeStats } from './output.js';
 
 const DATA_DIR = join(import.meta.dirname, '..', 'data', 'midnight');
+const RAW_DIR = join(import.meta.dirname, '..', 'data', 'raw');
 const OUTPUT_DIR = join(import.meta.dirname, '..', 'data', 'midnight');
 
 type Mode = 'full' | 'campaign' | 'campaign-key';
 
+// Zone name → UiMapID lookup
+const ZONE_IDS: Record<string, number> = {
+  eversong: 2395,
+  zulaman: 2437,
+  harandar: 2413,
+  voidstorm: 2405,
+};
+
+/**
+ * Load UiMapAssignment data and build a lookup of Region bounds per UiMapID.
+ * Used to convert world coordinates to normalized 0-1 map coordinates.
+ */
+async function loadMapRegions(): Promise<Map<number, UiMapRegion>> {
+  const raw = JSON.parse(await readFile(join(RAW_DIR, 'uimapassignment.json'), 'utf-8'));
+  const regions = new Map<number, UiMapRegion>();
+  for (const entry of raw) {
+    // Only store first (OrderIndex 0) entry per UiMapID
+    if (!regions.has(entry.UiMapID) || entry.OrderIndex === 0) {
+      regions.set(entry.UiMapID, {
+        UiMapID: entry.UiMapID,
+        Region: entry.Region,
+      });
+    }
+  }
+  return regions;
+}
+
+/**
+ * Convert world coordinates to normalized 0-1 map coordinates.
+ * WoW world X/Y are swapped relative to map display axes.
+ */
+function worldToMap(worldX: number, worldY: number, region: UiMapRegion): { mapX: number; mapY: number } | null {
+  const R = region.Region;
+  // R = [minX, minY, zMin, maxX, maxY, zMax]
+  const mapX = (R[4] - worldY) / (R[4] - R[1]);
+  const mapY = (R[3] - worldX) / (R[3] - R[0]);
+  if (mapX < -0.1 || mapX > 1.1 || mapY < -0.1 || mapY > 1.1) return null;
+  return { mapX: Math.max(0, Math.min(1, mapX)), mapY: Math.max(0, Math.min(1, mapY)) };
+}
+
+/**
+ * Attach normalized mapX/mapY to all guide steps.
+ */
+function attachMapCoords(steps: GuideStep[], regions: Map<number, UiMapRegion>): void {
+  let converted = 0;
+  for (const step of steps) {
+    const region = regions.get(step.mapId);
+    if (!region) continue;
+    const result = worldToMap(step.location.x, step.location.y, region);
+    if (result) {
+      step.mapX = result.mapX;
+      step.mapY = result.mapY;
+      converted++;
+    }
+  }
+  console.log(`Map coordinates: ${converted}/${steps.length} steps converted.`);
+}
+
+function parseZoneOrder(arg: string | undefined): number[] | null {
+  if (!arg) return null;
+  const names = arg.toLowerCase().split(',').map(s => s.trim());
+  const ids: number[] = [];
+  for (const name of names) {
+    const id = ZONE_IDS[name.replace(/[' -]/g, '')];
+    if (!id) {
+      console.error(`Unknown zone: "${name}". Valid zones: ${Object.keys(ZONE_IDS).join(', ')}`);
+      process.exit(1);
+    }
+    ids.push(id);
+  }
+  return ids;
+}
+
 async function main() {
   const mode: Mode = (process.argv[2] as Mode) || 'full';
+  const zoneOrderArg = process.argv[3]; // optional: "eversong,zulaman,harandar,voidstorm"
   console.log('OpenQuest — Route Optimization Engine');
   console.log(`Mode: ${mode}`);
+  if (zoneOrderArg) console.log(`Zone order override: ${zoneOrderArg}`);
   console.log('=====================================\n');
 
   // Load data
@@ -77,8 +153,10 @@ async function main() {
   // Solve zone ordering
   const questMap = new Map(filteredQuests.map(q => [q.id, q]));
   const zonePrereqs = buildZoneConstraints(dag, questMap);
-  const zoneOrder = solveZoneOrder(zones, zonePrereqs);
-  console.log('Zone order:', zoneOrder.map(id => zones.get(id)?.name || id).join(' → '));
+  const manualOrder = parseZoneOrder(zoneOrderArg);
+  const zoneOrder = manualOrder || solveZoneOrder(zones, zonePrereqs);
+  const orderLabel = manualOrder ? '(manual)' : '(auto-optimized)';
+  console.log(`Zone order ${orderLabel}:`, zoneOrder.map(id => zones.get(id)?.name || id).join(' → '));
   console.log();
 
   // Solve per-zone routes
@@ -135,9 +213,13 @@ async function main() {
 
   // Calculate and compare distances
   const naiveDistance = calculateNaiveDistance(filteredQuests);
+  const chainDistance = calculateChainOrderDistance(filteredQuests);
   const optimizedDistance = calculateRouteDistance(allSteps);
-  const improvement = naiveDistance > 0
+  const vsNaive = naiveDistance > 0
     ? ((1 - optimizedDistance / naiveDistance) * 100).toFixed(1)
+    : '0';
+  const vsChain = chainDistance > 0
+    ? ((1 - optimizedDistance / chainDistance) * 100).toFixed(1)
     : '0';
 
   console.log('=== Route Summary ===');
@@ -148,10 +230,15 @@ async function main() {
   console.log(`Extras: ${stats.collects} (${stats.extras.glyphs} glyphs, ${stats.extras.treasures} treasures, ${stats.extras.rares} rares)`);
   console.log(`Zones: ${stats.zones.join(', ')}`);
   console.log(`\nDistance comparison:`);
-  console.log(`  Naive (quest ID order): ${naiveDistance.toFixed(0)}`);
-  console.log(`  Optimized route:        ${optimizedDistance.toFixed(0)}`);
-  console.log(`  Improvement:            ${improvement}%`);
+  console.log(`  Naive (quest ID order):       ${naiveDistance.toFixed(0)}`);
+  console.log(`  Chain order (one chain/time):  ${chainDistance.toFixed(0)}`);
+  console.log(`  Optimized route:               ${optimizedDistance.toFixed(0)}`);
+  console.log(`  vs naive: ${vsNaive}%  vs chain: ${vsChain}%`);
   console.log();
+
+  // Attach normalized map coordinates
+  const mapRegions = await loadMapRegions();
+  attachMapCoords(allSteps, mapRegions);
 
   // Output
   await mkdir(OUTPUT_DIR, { recursive: true });
@@ -165,8 +252,10 @@ async function main() {
   await writeFile(statsPath, JSON.stringify({
     ...stats,
     naiveDistance,
+    chainDistance,
     optimizedDistance,
-    improvementPct: parseFloat(improvement),
+    vsNaivePct: parseFloat(vsNaive),
+    vsChainPct: parseFloat(vsChain),
     mode,
     generatedAt: new Date().toISOString(),
   }, null, 2));
@@ -189,6 +278,44 @@ function calculateNaiveDistance(quests: Quest[]): number {
   let dist = 0;
   for (const zoneQuests of byZone.values()) {
     const sorted = [...zoneQuests].sort((a, b) => a.id - b.id);
+    let pos: Coord | null = null;
+
+    for (const q of sorted) {
+      const accept = q.acceptLocation || q.objectiveLocations[0] || q.turnInLocation;
+      if (!accept) continue;
+
+      if (pos) dist += euclidean(pos, accept);
+      pos = accept;
+
+      for (const obj of q.objectiveLocations) {
+        dist += euclidean(pos!, obj);
+        pos = obj;
+      }
+
+      const turnin = q.turnInLocation || accept;
+      dist += euclidean(pos!, turnin);
+      pos = turnin;
+    }
+  }
+  return dist;
+}
+
+function calculateChainOrderDistance(quests: Quest[]): number {
+  // Calculate distance of doing quests in quest-chain order (orderIndex within questLine)
+  // This is closer to what a player would naturally do — follow each chain sequentially
+  const byZone = new Map<number, Quest[]>();
+  for (const q of quests) {
+    if (!byZone.has(q.mapId)) byZone.set(q.mapId, []);
+    byZone.get(q.mapId)!.push(q);
+  }
+
+  let dist = 0;
+  for (const zoneQuests of byZone.values()) {
+    // Sort by questLine then orderIndex — do one chain at a time
+    const sorted = [...zoneQuests].sort((a, b) => {
+      if (a.questLineId !== b.questLineId) return a.questLineId - b.questLineId;
+      return a.orderIndex - b.orderIndex;
+    });
     let pos: Coord | null = null;
 
     for (const q of sorted) {

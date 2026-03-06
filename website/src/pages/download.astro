@@ -1,0 +1,74 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Download">
+  <div class="max-w-3xl mx-auto py-16 px-4">
+    <h1 class="text-4xl font-bold text-white mb-8">Download OpenQuest</h1>
+
+    <!-- Download Links -->
+    <div class="bg-midnight-700 border border-midnight-600 rounded-lg p-8 mb-8">
+      <h2 class="text-2xl font-semibold text-white mb-4">Get the Addon</h2>
+      <div class="space-y-4">
+        <a
+          href="https://github.com/jrobcodes/openquest/releases/latest"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-between bg-midnight-600 hover:bg-midnight-500 rounded-lg p-4 transition-colors"
+        >
+          <div>
+            <p class="text-white font-medium">GitHub Releases</p>
+            <p class="text-gray-400 text-sm">Download the latest .zip</p>
+          </div>
+          <span class="text-gold-400">&#x2192;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Install Instructions -->
+    <div class="bg-midnight-700 border border-midnight-600 rounded-lg p-8 mb-8">
+      <h2 class="text-2xl font-semibold text-white mb-4">Installation</h2>
+      <ol class="space-y-4 text-gray-300">
+        <li class="flex gap-3">
+          <span class="text-gold-400 font-bold shrink-0">1.</span>
+          <div>
+            <p>Download the latest release <code class="bg-midnight-600 px-1.5 py-0.5 rounded text-sm">OpenQuest-x.x.x.zip</code></p>
+          </div>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-gold-400 font-bold shrink-0">2.</span>
+          <div>
+            <p>Extract the zip file</p>
+          </div>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-gold-400 font-bold shrink-0">3.</span>
+          <div>
+            <p>Copy the <code class="bg-midnight-600 px-1.5 py-0.5 rounded text-sm">OpenQuest</code> folder into your WoW addons directory:</p>
+            <code class="block bg-midnight-800 mt-2 p-3 rounded text-sm text-gray-400 overflow-x-auto">
+              World of Warcraft/_retail_/Interface/AddOns/OpenQuest
+            </code>
+          </div>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-gold-400 font-bold shrink-0">4.</span>
+          <p>Restart WoW or type <code class="bg-midnight-600 px-1.5 py-0.5 rounded text-sm">/reload</code> in-game</p>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Dependencies -->
+    <div class="bg-midnight-700 border border-midnight-600 rounded-lg p-8">
+      <h2 class="text-2xl font-semibold text-white mb-4">Optional Dependencies</h2>
+      <div class="space-y-3 text-gray-300">
+        <div>
+          <p class="font-medium text-white">TomTom</p>
+          <p class="text-sm text-gray-400">
+            For in-game waypoint arrows. OpenQuest sets TomTom waypoints automatically when installed.
+            Available on CurseForge.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
