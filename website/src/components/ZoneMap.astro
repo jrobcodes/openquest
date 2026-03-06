@@ -51,159 +51,153 @@ const base = import.meta.env.BASE_URL;
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script>
-  declare const L: typeof import('leaflet');
+<script is:inline>
+  (function() {
+    var app = document.getElementById('zone-map-app');
+    if (!app) return;
+    var zoneName = app.dataset.zoneName;
+    var zoneKey = app.dataset.zoneKey;
+    var base = app.dataset.base || '';
 
-  interface GuideStep {
-    stepNumber: number;
-    action: string;
-    questId?: number;
-    questTitle?: string;
-    description: string;
-    zone: string;
-    mapX?: number;
-    mapY?: number;
-    extraType?: string;
-    npcName?: string;
-    isCampaign?: boolean;
-  }
+    var actionColors = {
+      accept: '#22c55e',
+      turnin: '#3b82f6',
+      objective: '#eab308',
+      collect: '#a855f7',
+      travel: '#6b7280',
+    };
 
-  const app = document.getElementById('zone-map-app')!;
-  const zoneName = app.dataset.zoneName!;
-  const base = app.dataset.base || '';
+    var actionIcons = {
+      accept: '!',
+      turnin: '?',
+      objective: '*',
+      collect: '+',
+      travel: '>',
+    };
 
-  const actionColors: Record<string, string> = {
-    accept: '#22c55e',
-    turnin: '#3b82f6',
-    objective: '#eab308',
-    collect: '#a855f7',
-    travel: '#6b7280',
-  };
+    // Image is 3840x2560 -> aspect ratio 1.5:1
+    var imgW = 1.5;
+    var imgH = 1;
+    var bounds = [[0, 0], [imgH, imgW]];
 
-  const actionIcons: Record<string, string> = {
-    accept: '!',
-    turnin: '?',
-    objective: '*',
-    collect: '+',
-    travel: '>',
-  };
+    var map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: 0,
+      maxZoom: 4,
+      zoomSnap: 0.5,
+      maxBounds: [[-0.1, -0.1], [imgH + 0.1, imgW + 0.1]],
+    });
 
-  // Initialize Leaflet with simple CRS (pixel coordinates)
-  const map = L.map('map', {
-    crs: L.CRS.Simple,
-    minZoom: 0,
-    maxZoom: 4,
-    zoomSnap: 0.5,
-  });
+    map.fitBounds(bounds);
 
-  // Set bounds: mapX/mapY are normalized 0-1
-  const bounds: L.LatLngBoundsExpression = [[0, 0], [1, 1]];
-  map.fitBounds(bounds);
+    var imageUrl = base + 'maps/' + zoneKey + '.png';
+    L.imageOverlay(imageUrl, bounds).addTo(map);
 
-  // Try to load zone map image as overlay
-  const zoneKey = app.dataset.zoneKey!;
-  const imageUrl = `${base}maps/${zoneKey}.png`;
-  L.imageOverlay(imageUrl, bounds).addTo(map);
+    var allSteps = [];
+    var markers = [];
+    var routeLine = null;
 
-  let allSteps: GuideStep[] = [];
-  let markers: L.CircleMarker[] = [];
-  let routeLine: L.Polyline | null = null;
-
-  async function loadData() {
-    const res = await fetch(`${base}data/guide-full.json`);
-    const guide: GuideStep[] = await res.json();
-    allSteps = guide.filter(s => s.zone === zoneName && s.mapX != null && s.mapY != null);
-    render();
-  }
-
-  function shouldShow(step: GuideStep): boolean {
-    const showCampaign = (document.getElementById('filter-campaign') as HTMLInputElement).checked;
-    const showSide = (document.getElementById('filter-side') as HTMLInputElement).checked;
-    const showExtras = (document.getElementById('filter-extras') as HTMLInputElement).checked;
-
-    if (step.extraType) return showExtras;
-    if (step.isCampaign) return showCampaign;
-    return showSide;
-  }
-
-  function render() {
-    // Clear existing
-    markers.forEach(m => m.remove());
-    markers = [];
-    routeLine?.remove();
-
-    const filtered = allSteps.filter(shouldShow);
-    const showRoute = (document.getElementById('filter-route') as HTMLInputElement).checked;
-
-    // Route line
-    if (showRoute && filtered.length > 1) {
-      const points: L.LatLngExpression[] = filtered.map(s => [1 - s.mapY!, s.mapX!]);
-      routeLine = L.polyline(points, {
-        color: '#6b7280',
-        weight: 1.5,
-        opacity: 0.4,
-        dashArray: '4 4',
-      }).addTo(map);
+    function loadData() {
+      fetch(base + 'data/guide-full.json')
+        .then(function(res) { return res.json(); })
+        .then(function(guide) {
+          allSteps = guide.filter(function(s) {
+            return s.zone === zoneName && s.mapX != null && s.mapY != null;
+          });
+          render();
+        });
     }
 
-    // Markers
-    filtered.forEach(step => {
-      const color = actionColors[step.action] ?? '#6b7280';
-      const marker = L.circleMarker([1 - step.mapY!, step.mapX!], {
-        radius: 5,
-        fillColor: color,
-        color: '#000',
-        weight: 1,
-        fillOpacity: 0.9,
-      }).addTo(map);
+    function shouldShow(step) {
+      var showCampaign = document.getElementById('filter-campaign').checked;
+      var showSide = document.getElementById('filter-side').checked;
+      var showExtras = document.getElementById('filter-extras').checked;
 
-      marker.bindPopup(`
-        <div style="min-width:160px">
-          <strong style="color:#fff">${step.description}</strong><br/>
-          <span style="color:#9ca3af;font-size:12px">Step ${step.stepNumber}</span>
-          ${step.npcName ? `<br/><span style="color:#9ca3af;font-size:12px">NPC: ${step.npcName}</span>` : ''}
-          ${step.questTitle ? `<br/><span style="color:#a78bfa;font-size:12px">${step.questTitle}</span>` : ''}
-        </div>
-      `);
+      if (step.extraType) return showExtras;
+      if (step.isCampaign) return showCampaign;
+      return showSide;
+    }
 
-      markers.push(marker);
-    });
+    function render() {
+      markers.forEach(function(m) { m.remove(); });
+      markers = [];
+      if (routeLine) { routeLine.remove(); routeLine = null; }
 
-    // Step list
-    const stepList = document.getElementById('step-list')!;
-    const stepCount = document.getElementById('step-count')!;
-    stepCount.textContent = `${filtered.length} steps`;
+      var filtered = allSteps.filter(shouldShow);
+      var showRoute = document.getElementById('filter-route').checked;
 
-    stepList.innerHTML = filtered.map((step, i) => {
-      const color = actionColors[step.action] ?? '#6b7280';
-      const icon = actionIcons[step.action] ?? '?';
-      return `
-        <button class="step-item w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-midnight-700/60 transition-colors flex items-center gap-2.5" data-index="${i}">
-          <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style="background:${color};color:#000">${icon}</span>
-          <span class="text-gray-400 truncate hover:text-gray-200">${step.description}</span>
-        </button>
-      `;
-    }).join('');
+      // Route line — mapX/mapY are 0-1 normalized, scale to image bounds
+      if (showRoute && filtered.length > 1) {
+        var points = filtered.map(function(s) {
+          return [(1 - s.mapY) * imgH, s.mapX * imgW];
+        });
+        routeLine = L.polyline(points, {
+          color: '#6b7280',
+          weight: 1.5,
+          opacity: 0.4,
+          dashArray: '4 4',
+        }).addTo(map);
+      }
 
-    // Click step -> pan to marker
-    stepList.querySelectorAll('.step-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = Number(btn.getAttribute('data-index'));
-        const step = filtered[idx];
-        if (step && markers[idx]) {
-          map.setView([1 - step.mapY!, step.mapX!], 3);
-          markers[idx].openPopup();
-        }
+      // Markers
+      filtered.forEach(function(step) {
+        var color = actionColors[step.action] || '#6b7280';
+        var latlng = [(1 - step.mapY) * imgH, step.mapX * imgW];
+        var marker = L.circleMarker(latlng, {
+          radius: 5,
+          fillColor: color,
+          color: '#000',
+          weight: 1,
+          fillOpacity: 0.9,
+        }).addTo(map);
+
+        marker.bindPopup(
+          '<div style="min-width:160px">' +
+            '<strong style="color:#fff">' + step.description + '</strong><br/>' +
+            '<span style="color:#9ca3af;font-size:12px">Step ' + step.stepNumber + '</span>' +
+            (step.npcName ? '<br/><span style="color:#9ca3af;font-size:12px">NPC: ' + step.npcName + '</span>' : '') +
+            (step.questTitle ? '<br/><span style="color:#a78bfa;font-size:12px">' + step.questTitle + '</span>' : '') +
+          '</div>'
+        );
+
+        markers.push(marker);
       });
+
+      // Step list
+      var stepList = document.getElementById('step-list');
+      var stepCount = document.getElementById('step-count');
+      stepCount.textContent = filtered.length + ' steps';
+
+      stepList.innerHTML = filtered.map(function(step, i) {
+        var color = actionColors[step.action] || '#6b7280';
+        var icon = actionIcons[step.action] || '?';
+        return '<button class="step-item w-full text-left px-2.5 py-2 rounded-lg text-xs hover:bg-midnight-700/60 transition-colors flex items-center gap-2.5" data-index="' + i + '">' +
+          '<span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style="background:' + color + ';color:#000">' + icon + '</span>' +
+          '<span class="text-gray-400 truncate">' + step.description + '</span>' +
+        '</button>';
+      }).join('');
+
+      // Click step -> pan to marker
+      stepList.querySelectorAll('.step-item').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var idx = Number(btn.getAttribute('data-index'));
+          var step = filtered[idx];
+          if (step && markers[idx]) {
+            map.setView([(1 - step.mapY) * imgH, step.mapX * imgW], 3);
+            markers[idx].openPopup();
+          }
+        });
+      });
+    }
+
+    // Filter change handlers
+    ['filter-campaign', 'filter-side', 'filter-extras', 'filter-route'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('change', render);
     });
-  }
 
-  // Filter change handlers
-  ['filter-campaign', 'filter-side', 'filter-extras', 'filter-route'].forEach(id => {
-    document.getElementById(id)?.addEventListener('change', render);
-  });
-
-  loadData();
+    loadData();
+  })();
 </script>
