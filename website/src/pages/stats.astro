@@ -4,6 +4,7 @@ import StatsCard from '../components/StatsCard.astro';
 import { zones, zoneNameToKey } from '../lib/map-config';
 import fs from 'node:fs';
 import path from 'node:path';
+const base = import.meta.env.BASE_URL;
 
 const dataDir = path.join(process.cwd(), 'public/data');
 
@@ -76,7 +77,7 @@ const rares = guideStats.extras?.rares ?? 0;
         <div class="space-y-3">
           {(guideStats.zones ?? []).map((zoneName: string) => (
             <a
-              href={`/map/${zoneNameToKey[zoneName] ?? zoneName.toLowerCase()}`}
+              href={`${base}map/${zoneNameToKey[zoneName] ?? zoneName.toLowerCase()}`}
               class="flex justify-between items-center hover:text-arcane-400 transition-colors"
             >
               <span class="text-gray-300">{zoneName}</span>

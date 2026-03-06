@@ -1,19 +1,20 @@
 ---
+const base = import.meta.env.BASE_URL;
 const currentPath = Astro.url.pathname;
 
 const links = [
-  { href: '/', label: 'Home' },
-  { href: '/map/voidstorm', label: 'Maps' },
-  { href: '/quests', label: 'Quests' },
-  { href: '/stats', label: 'Stats' },
-  { href: '/download', label: 'Download' },
+  { href: `${base}`, label: 'Home' },
+  { href: `${base}map/voidstorm`, label: 'Maps' },
+  { href: `${base}quests`, label: 'Quests' },
+  { href: `${base}stats`, label: 'Stats' },
+  { href: `${base}download`, label: 'Download' },
 ];
 ---
 
 <nav class="bg-midnight-800 border-b border-midnight-600">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <a href="/" class="flex items-center gap-2 text-gold-400 font-bold text-xl">
+      <a href={base} class="flex items-center gap-2 text-gold-400 font-bold text-xl">
         OpenQuest
       </a>
       <div class="hidden md:flex items-center gap-6">

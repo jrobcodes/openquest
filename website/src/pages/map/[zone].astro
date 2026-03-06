@@ -12,6 +12,7 @@ export function getStaticPaths() {
 
 const { zone } = Astro.params;
 const { zoneName } = Astro.props;
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title={`${zoneName} Map`}>
@@ -24,7 +25,7 @@ const { zoneName } = Astro.props;
       <div class="flex gap-2">
         {zones.map(z => (
           <a
-            href={`/map/${z.key}`}
+            href={`${base}map/${z.key}`}
             class:list={[
               'text-sm px-3 py-1.5 rounded-lg border transition-colors',
               z.key === zone
